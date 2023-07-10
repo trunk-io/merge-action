@@ -1,0 +1,57 @@
+name: Trunk Compute Impacted Targets
+author: trunk.io
+description: Trunk.io Github Action to Compute and Upload Impacted Targets
+
+inputs:
+  trunk-token:
+    description: Repo API token used for authentication. Can be found at app.trunk.io.
+    required: true
+  target-branch:
+    description:
+      The Merge Instance's target branch. If unspecified, defaults to the repository's default
+      branch.
+    required: false
+  verbose:
+    description: Whether to enable verbose logging. Defaults to false.
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: oracle
+        java-version: "17"
+
+    - name: Setup Bazel
+      uses: bazelbuild/setup-bazelisk@v2
+
+    - name: Prerequisites
+      id: prerequisites
+      run: ${GITHUB_ACTION_PATH}/prerequisites.sh
+      shell: bash
+      env:
+        TARGET_BRANCH: ${{ inputs.target-branch }}
+        DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+
+    - name: Compute Impacted Targets
+      id: compute-impacted-targets
+      run: ${GITHUB_ACTION_PATH}/compute_impacted_targets.sh
+      shell: bash
+      env:
+        MERGE_INSTANCE_BRANCH: ${{ steps.prerequisites.outputs.merge_instance_branch }}
+        PR_BRANCH: ${{ github.head_ref }}
+        VERBOSE: ${{ inputs.verbose }}
+
+    - name: Upload Impacted Targets
+      run: ${GITHUB_ACTION_PATH}/upload_impacted_targets.sh
+      shell: bash
+      env:
+        ACTOR: ${{ github.actor }}
+        API_TOKEN: ${{ inputs.trunk-token }}
+        REPOSITORY: ${{ github.repository }}
+        TARGET_BRANCH: ${{ steps.prerequisites.outputs.merge_instance_branch }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        PR_SHA: ${{ steps.compute-impacted-targets.outputs.git_commit }}
+        IMPACTED_TARGETS_FILE: ${{ steps.compute-impacted-targets.outputs.impacted_targets_out }}
