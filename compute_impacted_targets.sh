@@ -23,9 +23,6 @@ logIfVerbose "...done!"
 
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 curl -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
-
-# Assumption: a WORKSPACE file exists at the root of the caller's repo
-# TODO: Should be overridable
 workspace_path=$(pwd)
 
 git switch "${MERGE_INSTANCE_BRANCH}"

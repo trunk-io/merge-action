@@ -38,3 +38,8 @@ jobs:
 An impacted target is a unit that is affected by a particular PR. For example, a change at `src/backend/app` will impact the Bazel `src/backend` package. Any two pull requests that share an impacted target must be tested together; otherwise, they can be tested independently. 
 
 We currently support Bazel; other solutions, such as Buck, Nx, etc. are on the way! You may also define your own suite of impacted targets using glob-based targets.
+
+
+### Under the hood: Bazel
+
+We use Tinder's [bazel-diff](https://github.com/Tinder/bazel-diff) tool to compute the impacted targets of a particular PR. The tool computes a mapping of package --> hash at the source and dest shas, then reports any packages which have a differing hash.
