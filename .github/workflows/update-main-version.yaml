@@ -1,4 +1,3 @@
-
 name: Update release version
 run-name: Move ${{ github.event.inputs.major_version }} to ${{ github.event.inputs.target }}
 
