@@ -3,18 +3,18 @@
 set -euo pipefail
 
 ifVerbose() {
-  if [[ -n ${VERBOSE} ]]; then
-    "$@"
-  fi
+	if [[ -n ${VERBOSE} ]]; then
+		"$@"
+	fi
 }
 
 logIfVerbose() {
-  ifVerbose echo "$@"
+	ifVerbose echo "$@"
 }
 
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
-  echo "Missing branch"
-  exit 2
+	echo "Missing branch"
+	exit 2
 fi
 
 logIfVerbose "Fetching all remotes..."
@@ -72,10 +72,5 @@ num_impacted_targets=$(wc -l <"${impacted_targets_out}")
 echo "Computed ${num_impacted_targets} targets for sha ${pr_branch_head_sha}"
 
 # Outputs
-if [[ -v GITHUB_OUTPUT && -f ${GITHUB_OUTPUT} ]]; then
-  echo "git_commit=${pr_branch_head_sha}" >>"${GITHUB_OUTPUT}"
-  echo "impacted_targets_out=${impacted_targets_out}" >>"${GITHUB_OUTPUT}"
-else
-  echo "::set-output name=git_commit::${pr_branch_head_sha}"
-  echo "::set-output name=impacted_targets_out::${impacted_targets_out}"
-fi
+echo "git_commit=${pr_branch_head_sha}" >>"${GITHUB_OUTPUT}"
+echo "impacted_targets_out=${impacted_targets_out}" >>"${GITHUB_OUTPUT}"

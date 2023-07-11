@@ -6,6 +6,9 @@ plugins:
     - id: trunk
       ref: v0.0.21
       uri: https://github.com/trunk-io/plugins
+    - id: configs
+      uri: https://github.com/trunk-io/configs
+      ref: v0.0.3
 lint:
   enabled:
     - git-diff-check

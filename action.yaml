@@ -27,6 +27,12 @@ runs:
     - name: Setup Bazel
       uses: bazelbuild/setup-bazelisk@v2
 
+    - name: Setup Tools
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install jq
+
     - name: Prerequisites
       id: prerequisites
       run: ${GITHUB_ACTION_PATH}/prerequisites.sh
