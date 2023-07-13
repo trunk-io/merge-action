@@ -10,8 +10,8 @@ plugins:
       uri: https://github.com/trunk-io/configs
       ref: v0.0.3
 lint:
-  disabled:
   enabled:
+    - gitleaks@8.17.0
     - eslint@8.44.0
     - git-diff-check
     - markdownlint@0.35.0
