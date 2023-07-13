@@ -10,28 +10,17 @@ http_archive(
 ##################
 # rules_ts setup #
 ##################
-# Fetches the rules_ts dependencies.
-# If you want to have a different version of some dependency,
-# you should fetch it *before* calling this.
-# Alternatively, you can skip calling this function, so long as you've
-# already fetched all the dependencies.
 load("@aspect_rules_ts//ts:repositories.bzl", "rules_ts_dependencies")
 
 rules_ts_dependencies(
-    # This keeps the TypeScript version in-sync with the editor, which is typically best.
     ts_version_from = "//:package.json",
-
-    # Alternatively, you could pick a specific version, or use
-    # load("@aspect_rules_ts//ts:repositories.bzl", "LATEST_TYPESCRIPT_VERSION")
-    # ts_version = LATEST_TYPESCRIPT_VERSION
 )
 
-# Fetch and register node, if you haven't already
-load("@rules_nodejs//nodejs:repositories.bzl", "DEFAULT_NODE_VERSION", "nodejs_register_toolchains")
+load("@rules_nodejs//nodejs:repositories.bzl", "nodejs_register_toolchains")
 
 nodejs_register_toolchains(
     name = "node",
-    node_version = DEFAULT_NODE_VERSION,
+    node_version = "18.13.0",
 )
 
 # Register aspect_bazel_lib toolchains;
@@ -41,3 +30,50 @@ load("@aspect_bazel_lib//lib:repositories.bzl", "register_copy_directory_toolcha
 register_copy_directory_toolchains()
 
 register_copy_to_directory_toolchains()
+
+##################
+#     Docker     #
+##################
+
+http_archive(
+    name = "io_bazel_rules_docker",
+    sha256 = "b1e80761a8a8243d03ebca8845e9cc1ba6c82ce7c5179ce2b295cd36f7e394bf",
+    urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v0.25.0/rules_docker-v0.25.0.tar.gz"],
+)
+
+load(
+    "@io_bazel_rules_docker//toolchains/docker:toolchain.bzl",
+    docker_toolchain_configure = "toolchain_configure",
+)
+
+docker_toolchain_configure(
+    name = "docker_config",
+)
+
+load(
+    "@io_bazel_rules_docker//repositories:repositories.bzl",
+    container_repositories = "repositories",
+)
+
+container_repositories()
+
+load("@io_bazel_rules_docker//repositories:deps.bzl", container_deps = "deps")
+
+container_deps()
+
+load(
+    "@io_bazel_rules_docker//container:container.bzl",
+    "container_pull",
+)
+
+##################
+#     Docker     #
+#   Containers   #
+##################
+
+container_pull(
+    name = "linux_base",
+    digest = "sha256:97dc4fbf18419ef928bcddb865ccf0536d4cc39ae3ace5a2b4273c11aedbea82",
+    registry = "gcr.io",
+    repository = "google-appengine/debian11",
+)
