@@ -5,19 +5,28 @@
   "keywords": [],
   "license": "ISC",
   "author": "",
-  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@types/node": "20.4.2",
-    "typescript": "5.1.6"
-  },
-  "devDependencies": {
     "@types/chai": "4.3.5",
     "@types/mocha": "10.0.1",
+    "@types/node": "20.4.2",
     "chai": "4.3.7",
-    "mocha": "10.2.0"
+    "mocha": "10.2.0",
+    "typescript": "5.1.6"
+  },
+  "resolve": {
+    "mainFields": [
+      "browser",
+      "main",
+      "module"
+    ],
+    "extensions": [
+      ".js",
+      ".json",
+      ".jsx"
+    ]
   }
 }

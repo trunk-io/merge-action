@@ -4,8 +4,8 @@ load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
 ts_project(
     name = "lib",
     srcs = ["lib.ts"],
-    composite = True,
     declaration = True,
+    resolve_json_module = True,
     source_map = True,
     tsconfig = "//:root_tsconfig",
 )
@@ -13,15 +13,19 @@ ts_project(
 ts_project(
     name = "app",
     srcs = ["app.ts"],
-    composite = True,
     declaration = True,
+    resolve_json_module = True,
     source_map = True,
     tsconfig = "//:root_tsconfig",
-    deps = [":lib"],
+    deps = [
+        ":lib",
+        "//:node_modules/@types/chai",
+    ],
 )
 
 js_binary(
     name = "bin",
-    entry_point = "app.ts",
+    data = [":app"],
+    entry_point = "app.js",
     expected_exit_code = 0,
 )

@@ -1,3 +1,8 @@
-import { HELLO_WORLD } from "src/hello_world/node/lib";
+import { HELLO_WORLD } from "./lib";
+import chai from "chai";
 
-console.log(HELLO_WORLD);
+try {
+  chai.expect(HELLO_WORLD).to.equal("Goodbye, world!");
+} catch (err) {
+  console.log("Caught an err!");
+}
