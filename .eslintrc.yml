@@ -1,0 +1,112 @@
+env:
+  browser: true
+  es2021: true
+extends: standard-with-typescript
+parserOptions:
+  ecmaVersion: latest
+  sourceType: module
+rules:
+  # Turn off base eslint rules in lieu of @typescript-eslint rules (just below)
+  no-return-await: off
+  no-shadow: off
+  no-unused-expressions: off
+  no-unused-vars: off
+  no-use-before-define: off
+  no-useless-constructor: off
+
+  "@typescript-eslint/lines-between-class-members": [error, always, { exceptAfterSingleLine: true }]
+  "@typescript-eslint/naming-convention":
+    - error
+    # Starting with a minimal set of uncontroversial rules. We should add more to cover the many
+    # selectors for which we should have consistent style.
+    - selector: typeLike
+      format: [PascalCase]
+    - selector: variable
+      modifiers: [global, const]
+      # The plugin can't differentiate between:
+      # - values, which should be UPPER_CASE
+      # - arrow functions, which should be camelCase
+      format: [UPPER_CASE, camelCase]
+    - selector: classProperty
+      modifiers: [private]
+      format: [camelCase]
+      leadingUnderscore: allow
+  "@typescript-eslint/no-shadow": error
+  "@typescript-eslint/no-unused-expressions": [error]
+  "@typescript-eslint/no-unused-vars":
+    - error
+    - argsIgnorePattern: ^_
+      destructuredArrayIgnorePattern: ^_
+  "@typescript-eslint/no-use-before-define": [error]
+  "@typescript-eslint/no-useless-constructor": [error]
+  "@typescript-eslint/quotes": "off"
+  "@typescript-eslint/semi": "off"
+
+  class-methods-use-this: off
+  curly: error
+  func-names: [error, as-needed]
+  func-style: [error, expression, { "allowArrowFunctions": true }]
+  import/extensions:
+    - error
+    - ignorePackages
+    - js: never
+      jsx: never
+      ts: never
+      tsx: never
+  import/no-extraneous-dependencies:
+    - error
+    - devDependencies:
+        - jest-resolver.js
+        - jest.config.common.ts
+        - trunk/vscode/docker_tests/**
+        - trunk/web/common/test-utils/**
+        - "**/next.config.js"
+        - "**/jest.config.ts"
+        - "**/jest-setup.ts"
+        - "**/*.test.ts"
+        - "**/*.spec.ts"
+        - "**/*.test.tsx"
+        - "**/__tests__/**"
+        - "**/__mocks__/**"
+        - "**/playwright.config.ts"
+        - "**/*.stories.tsx"
+        - "**/.storybook/**/*"
+  import/no-unresolved: off
+  import/prefer-default-export: off
+  jsx-a11y/anchor-is-valid: off
+  lines-between-class-members: off
+  max-len:
+    - error
+    - code: 120
+      comments: 130
+      tabWidth: 2
+      ignoreComments: false
+      ignoreTrailingComments: false
+      ignoreUrls: true
+      ignoreStrings: true
+      ignoreTemplateLiterals: true
+      ignoreRegExpLiterals: true
+  no-continue: off
+  no-param-reassign: [error, { props: false }]
+  no-restricted-syntax: off
+  no-underscore-dangle: [error, { allowAfterThis: true }]
+  node/no-missing-import: off # bazel typescript doesn't work with this
+  node/no-unpublished-import: off # we don't publish this repo as an npm module, not needed
+  node/no-unpublished-require: off # we don't publish this repo as an npm module, not needed
+  react/function-component-definition: off
+  react/jsx-curly-newline: off
+  react/jsx-one-expression-per-line: off
+  react/jsx-props-no-spreading: off
+  react/prop-types: off
+  react/require-default-props: off
+  react/static-property-placement: off
+
+overrides:
+  - files: ["*.ts", "*.tsx", "*.mts", "*.cts"]
+    parserOptions:
+      project: ./tsconfig.json
+    rules:
+      "@typescript-eslint/no-floating-promises": [error, { ignoreIIFE: true }]
+      "require-await": "off"
+      "@typescript-eslint/require-await": error
+      no-void: [error, { allowAsStatement: true }]
