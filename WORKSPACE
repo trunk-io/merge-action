@@ -23,14 +23,6 @@ nodejs_register_toolchains(
     node_version = "18.13.0",  # pin the Node version
 )
 
-# Register aspect_bazel_lib toolchains;
-# If you use npm_translate_lock or npm_import from aspect_rules_js you can omit this block.
-load("@aspect_bazel_lib//lib:repositories.bzl", "register_copy_directory_toolchains", "register_copy_to_directory_toolchains")
-
-register_copy_directory_toolchains()
-
-register_copy_to_directory_toolchains()
-
 ##################
 #    npm setup   #
 ##################
