@@ -17,4 +17,4 @@ jobs:
       - name: Run Tests
         run: |
           pnpm install
-          npx jest tests/
+          pnpm test
