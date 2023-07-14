@@ -119,9 +119,7 @@ describe("ComputeImpactedTargetsAction", function () {
     };
 
     afterEach(function () {
-      if (fs.statSync(ENV_VARIABLES.IMPACTED_TARGETS_FILE, { throwIfNoEntry: false })) {
-        fs.rmSync(ENV_VARIABLES.IMPACTED_TARGETS_FILE);
-      }
+      fs.rmSync(ENV_VARIABLES.IMPACTED_TARGETS_FILE, { force: true });
     });
 
     it("rejects if missing required input", function () {
@@ -141,13 +139,13 @@ describe("ComputeImpactedTargetsAction", function () {
     });
 
     it("supports 1K targets", async function () {
-      const impactedTargets = [...new Array(1_000)].map((n) => `target-${n}`);
+      const impactedTargets = [...new Array(1_000)].map((_, i) => `target-${i}`);
       await runUploadTargets(impactedTargets);
       expectImpactedTargetsUpload(impactedTargets);
     });
 
     it("supports 100K targets", async function () {
-      const impactedTargets = [...new Array(1_000)].map((n) => `target-${n}`);
+      const impactedTargets = [...new Array(1_000)].map((_, i) => `target-${i}`);
       await runUploadTargets(impactedTargets);
       expectImpactedTargetsUpload(impactedTargets);
     });

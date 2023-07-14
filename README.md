@@ -11,9 +11,9 @@ dependent PRs; no more waiting for your backend changes to test before landing y
 
 ### How it Works
 
-After creating a MergeGraph [app.trunk.io](app.trunk.io), simply comment `/trunk merge` on your PRs
-to submit it to the graph. Once the graph has passed the prerequisites to be admitted into the graph
-(impacted targets have been uploaded, Github deems the PR mergeable), the Trunk Service will
+After creating a MergeGraph at [app.trunk.io](app.trunk.io), simply comment `/trunk merge` on your
+PRs to submit it to the graph. Once the graph has passed the prerequisites to be admitted into the
+graph (impacted targets have been uploaded, Github deems the PR mergeable), the Trunk Service will
 en-graph the PR, constructing a test branch between the PR and all of its ancestors. On successful
 completion of tests, Trunk merges the PR, keeping your main branch green 😎.
 
