@@ -15,7 +15,7 @@ trunk_js_binary(
 trunk_nodejs_container_image(
     name = "nodejs_image",
     args = ["src/**/app.ts"],
-    binary = ":bin",  # can this be a test?
+    binary = ":bin",
 )
 
 trunk_container_image(

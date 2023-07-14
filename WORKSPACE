@@ -49,21 +49,6 @@ load("@npm//:repositories.bzl", "npm_repositories")
 
 npm_repositories()
 
-##############
-# Jest Setup #
-##############
-
-http_archive(
-    name = "aspect_rules_jest",
-    sha256 = "098186ffc450f2a604843d8ba14217088a0e259ea6a03294af5360a7f1bcd3e8",
-    strip_prefix = "rules_jest-0.19.5",
-    url = "https://github.com/aspect-build/rules_jest/releases/download/v0.19.5/rules_jest-v0.19.5.tar.gz",
-)
-
-load("@aspect_rules_jest//jest:dependencies.bzl", "rules_jest_dependencies")
-
-rules_jest_dependencies()
-
 ##########
 # Docker #
 ##########

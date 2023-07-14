@@ -1,6 +1,6 @@
-load("@aspect_rules_jest//jest:defs.bzl", "jest_test")
 load("@aspect_rules_js//js:defs.bzl", "js_binary")
 load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
+load("@npm//:mocha/package_json.bzl", mocha_bin = "bin")
 
 def trunk_ts_lib(name, srcs, deps = []):
     ts_project(
@@ -21,15 +21,21 @@ def trunk_js_binary(name, data, entry_point):
         expected_exit_code = 0,
     )
 
-def trunk_ts_test(name, data):
-    jest_test(
+def trunk_ts_test(name, srcs, data, tags = [], node_options = []):
+    args = []
+    for src in srcs:
+        if not src.endswith(".ts"):
+            fail("All test files must end with .ts: {}".format(src))
+        args.append(native.package_name() + "/" + src[:-3] + ".js")
+
+    mocha_bin.mocha_test(
         name = name,
-        data = data + [
-            "//:node_modules/@types/jest",
-            "//:node_modules/jest",
-            "//:node_modules/jest-cli",
-            "//:node_modules/jest-junit",
-        ],
-        node_modules = "//:node_modules",
-        colors = True,
+        args = args,
+        data = data,
+        tags = tags,
+        testonly = True,
+        timeout = "short",
+        node_options = node_options,
+        log_level = "debug",
+        patch_node_fs = False,
     )
