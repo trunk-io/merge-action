@@ -60,7 +60,7 @@ describe("ComputeImpactedTargetsAction", function () {
   });
 
   after(function () {
-    // server.close();
+    server.close();
   });
 
   context("UploadImpactedTargets", function () {
@@ -106,7 +106,7 @@ describe("ComputeImpactedTargetsAction", function () {
       expect(() => exec.execFileSync(UPLOAD_IMPACTED_TARGETS_SCRIPT)).to.throw;
     });
 
-    it.only("hits the endpoint", async function () {
+    it("hits the endpoint", async function () {
       const impactedTargets = ["target-1", "target-2", "target-3"];
       await runUploadTargets(impactedTargets);
       expectImpactedTargetsUpload(impactedTargets);

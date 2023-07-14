@@ -1,5 +1,20 @@
-load("//toolchain/docker:defs.bzl", "trunk_container_image", "trunk_nodejs_container_image")
+load("//toolchain/docker:defs.bzl", "trunk_container_image", "trunk_container_run_and_commit", "trunk_nodejs_container_image")
 load("//toolchain/node:defs.bzl", "trunk_js_binary", "trunk_ts_lib", "trunk_ts_test")
+
+package(
+    default_visibility = ["//visibility:private"],
+)
+
+trunk_container_run_and_commit(
+    name = "nodejs_image_with_utils",
+    commands = [
+        "apt update && apt install -y " + " ".join([
+            "curl",
+            "jq",
+        ]) + " && rm -rf /var/lib/apt/lists/*",
+    ],
+    image = "@debian11//image",
+)
 
 trunk_ts_lib(
     name = "lib",
@@ -36,6 +51,7 @@ trunk_nodejs_container_image(
     name = "nodejs_test",
     testonly = True,
     args = ["src/**/upload.test.ts"],
+    base = ":nodejs_image_with_utils",
     binary = ":test",
 )
 
