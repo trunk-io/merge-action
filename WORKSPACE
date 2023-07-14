@@ -63,3 +63,49 @@ http_archive(
 load("@aspect_rules_jest//jest:dependencies.bzl", "rules_jest_dependencies")
 
 rules_jest_dependencies()
+
+##########
+# Docker #
+##########
+
+http_archive(
+    name = "io_bazel_rules_docker",
+    sha256 = "b1e80761a8a8243d03ebca8845e9cc1ba6c82ce7c5179ce2b295cd36f7e394bf",
+    urls = ["https://github.com/bazelbuild/rules_docker/releases/download/v0.25.0/rules_docker-v0.25.0.tar.gz"],
+)
+
+load(
+    "@io_bazel_rules_docker//toolchains/docker:toolchain.bzl",
+    docker_toolchain_configure = "toolchain_configure",
+)
+
+docker_toolchain_configure(
+    name = "docker_config",
+)
+
+load(
+    "@io_bazel_rules_docker//repositories:repositories.bzl",
+    container_repositories = "repositories",
+)
+
+container_repositories()
+
+load("@io_bazel_rules_docker//repositories:deps.bzl", container_deps = "deps")
+
+container_deps()
+
+load(
+    "@io_bazel_rules_docker//container:container.bzl",
+    "container_pull",
+)
+
+##############
+# Containers #
+##############
+
+container_pull(
+    name = "debian11",
+    digest = "sha256:97dc4fbf18419ef928bcddb865ccf0536d4cc39ae3ace5a2b4273c11aedbea82",
+    registry = "gcr.io",
+    repository = "google-appengine/debian11",
+)
