@@ -43,7 +43,10 @@ jobs:
 
 ### Tests
 
+```
+pnpm install
 npx jest tests/
+```
 
 ### What is an Impacted Target?
 
