@@ -11,6 +11,8 @@ trunk_ts_lib(
     deps = [
         ":lib",
         "//:node_modules/@types/chai",
+        "//:node_modules/@types/mocha",
+        "//:node_modules/mocha",
     ],
 )
 
