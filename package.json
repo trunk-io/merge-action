@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "keywords": [],
-  "license": "ISC",
+  "license": "UNLICENSED",
+  "private": true,
   "author": "",
   "main": "index.js",
   "scripts": {
