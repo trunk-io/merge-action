@@ -35,7 +35,7 @@ runs:
 
     - name: Prerequisites
       id: prerequisites
-      run: ${GITHUB_ACTION_PATH}/prerequisites.sh
+      run: ${GITHUB_ACTION_PATH}/src/scripts/prerequisites.sh
       shell: bash
       env:
         TARGET_BRANCH: ${{ inputs.target-branch }}
@@ -43,7 +43,7 @@ runs:
 
     - name: Compute Impacted Targets
       id: compute-impacted-targets
-      run: ${GITHUB_ACTION_PATH}/compute_impacted_targets.sh
+      run: ${GITHUB_ACTION_PATH}/src/scripts/compute_impacted_targets.sh
       shell: bash
       env:
         MERGE_INSTANCE_BRANCH: ${{ steps.prerequisites.outputs.merge_instance_branch }}
@@ -51,7 +51,7 @@ runs:
         VERBOSE: ${{ inputs.verbose }}
 
     - name: Upload Impacted Targets
-      run: ${GITHUB_ACTION_PATH}/upload_impacted_targets.sh
+      run: ${GITHUB_ACTION_PATH}/src/scripts/upload_impacted_targets.sh
       shell: bash
       env:
         ACTOR: ${{ github.actor }}
