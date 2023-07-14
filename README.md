@@ -41,6 +41,10 @@ jobs:
 
 <!-- end usage -->
 
+### Tests
+
+`bazel run //tests:test_image`
+
 ### What is an Impacted Target?
 
 An impacted target is a unit that is affected by a particular PR. For example, a change at
