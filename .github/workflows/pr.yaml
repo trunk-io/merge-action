@@ -9,9 +9,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup Bazel
-        uses: bazelbuild/setup-bazelisk@v2
-
       - name: Run Tests
         run: |
-          bazel run //tests:test_image
+          npx jest tests/

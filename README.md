@@ -43,7 +43,7 @@ jobs:
 
 ### Tests
 
-`bazel run //tests:test_image`
+npx jest tests/
 
 ### What is an Impacted Target?
 
