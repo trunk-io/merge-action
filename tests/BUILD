@@ -31,6 +31,7 @@ trunk_ts_lib(
         "//:node_modules/http-status-codes",
         "//:node_modules/lodash",
         "//:node_modules/mocha",
+        "//:node_modules/zod",
     ],
 )
 

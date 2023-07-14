@@ -9,6 +9,7 @@ import exec from "node:child_process";
 import fs from "node:fs";
 import http from "node:http";
 import util from "node:util";
+import { z } from "zod";
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -26,6 +27,20 @@ const ENV_VARIABLES: Record<string, string> = {
   IMPACTED_TARGETS_FILE: "/test-impacted-targets-file",
   API_URL: fetchUrl("/testUploadImpactedTargets"),
 };
+
+const SCHEMA = z.object({
+  repo: z.object({
+    host: z.string(),
+    owner: z.string(),
+    name: z.string(),
+  }),
+  pr: z.object({
+    number: z.string(),
+    sha: z.string(),
+  }),
+  targetBranch: z.string(),
+  impactedTargets: z.array(z.string()),
+});
 
 const exportEnv = (env: Record<string, string>) =>
   Object.entries(env)
@@ -67,10 +82,20 @@ describe("ComputeImpactedTargetsAction", function () {
     const expectImpactedTargetsUpload = (impactedTargets: string[]): void => {
       const { API_TOKEN, REPOSITORY, TARGET_BRANCH, PR_NUMBER, PR_SHA } = ENV_VARIABLES;
       const [actualToken, actualBody] = uploadedImpactedTargetsPayload;
-      assert(actualToken);
-      assert(actualBody);
-
-      // Assert on the body
+      expect(actualToken).to.equal(API_TOKEN);
+      expect(SCHEMA.parse(actualBody)).to.deep.equal({
+        repo: {
+          host: "github.com",
+          owner: REPOSITORY.split("/")[0],
+          name: REPOSITORY.split("/")[1],
+        },
+        pr: {
+          number: PR_NUMBER,
+          sha: PR_SHA,
+        },
+        targetBranch: TARGET_BRANCH,
+        impactedTargets,
+      });
     };
 
     const runUploadTargets = async (
@@ -81,9 +106,6 @@ describe("ComputeImpactedTargetsAction", function () {
       // The bazel / glob / ... scripts are responsible for populating these files.
       // Verify that the upload works as intended.
       fs.writeFileSync(env.IMPACTED_TARGETS_FILE, impactedTargets.join("\n"));
-
-      await util.promisify(exec.exec)("ls -alR");
-      console.log(`${exportEnv(env)} ${UPLOAD_IMPACTED_TARGETS_SCRIPT}`);
 
       const runScript = util.promisify(exec.exec)(
         `${exportEnv(env)} ${UPLOAD_IMPACTED_TARGETS_SCRIPT}`,
