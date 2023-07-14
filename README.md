@@ -43,7 +43,10 @@ jobs:
 
 ### Tests
 
-`bazel run //tests:test_image`
+```
+pnpm install
+pnpm test
+```
 
 ### What is an Impacted Target?
 

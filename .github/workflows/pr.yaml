@@ -9,9 +9,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup Bazel
-        uses: bazelbuild/setup-bazelisk@v2
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.7
 
       - name: Run Tests
         run: |
-          bazel run //tests:test_image
+          pnpm install
+          pnpm test

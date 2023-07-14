@@ -1,5 +1,2 @@
-# Bazel
-bazel-*
-
-# Node
 node_modules/**
+*_tmp
