@@ -1,8 +1,17 @@
 load("@aspect_rules_js//js:defs.bzl", "js_image_layer")
 load("@io_bazel_rules_docker//container:container.bzl", "container_image", "container_layer")
+load("@io_bazel_rules_docker//docker/util:run.bzl", "container_run_and_commit")
 
 def trunk_container_image(name, tags = [], legacy_run_behavior = False, **kwargs):
     container_image(name = name, tags = tags, legacy_run_behavior = legacy_run_behavior, **kwargs)
+
+def trunk_container_run_and_commit(name, tags = [], visibility = ["//visibility:public"], **kwargs):
+    container_run_and_commit(
+        name = name,
+        tags = tags,
+        visibility = visibility,
+        **kwargs
+    )
 
 def trunk_nodejs_container_image(name, binary, tags = [], layers = [], base = "@debian11//image", visibility = ["//visibility:public"], testonly = False, **kwargs):
     layers_name = name + "_layers"
