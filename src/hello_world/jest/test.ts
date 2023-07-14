@@ -96,9 +96,10 @@ afterAll(function () {
 
 // Tests
 
-// fix this test
 test("rejects if missing required input", async function () {
-  expect(() => exec.execFileSync(UPLOAD_IMPACTED_TARGETS_SCRIPT)).resolves;
+  await expect(() =>
+    util.promisify(exec.exec)(`${UPLOAD_IMPACTED_TARGETS_SCRIPT}`),
+  ).rejects.toBeTruthy();
 });
 
 test("hits the endpoint", async function () {
