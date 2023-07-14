@@ -24,7 +24,7 @@ trunk_ts_test(
     data = [":bin"],
 )
 
-# Test Dockerizing the Test
+# Dockerize the Test
 trunk_nodejs_container_image(
     name = "nodejs_test",
     testonly = True,
