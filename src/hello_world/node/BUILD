@@ -10,9 +10,6 @@ trunk_ts_lib(
     srcs = ["app.ts"],
     deps = [
         ":lib",
-        "//:node_modules/@types/chai",
-        "//:node_modules/@types/mocha",
-        "//:node_modules/mocha",
     ],
 )
 
