@@ -28,6 +28,7 @@ on: pull_request
 jobs:
   compute_impacted_targets:
     name: Compute Impacted Targets
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
