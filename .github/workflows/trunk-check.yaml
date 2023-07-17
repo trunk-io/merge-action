@@ -10,6 +10,9 @@ jobs:
   trunk_check:
     name: Trunk Check
     runs-on: ubuntu-latest
+    permissions:
+      repository-projects: read
+      checks: write
 
     steps:
       - name: Checkout
