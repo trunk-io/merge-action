@@ -8,7 +8,7 @@ permissions: read-all
 
 jobs:
   trunk_check:
-    name: Trunk Check
+    name: Trunk Check Runner
     runs-on: ubuntu-latest
     permissions:
       checks: write
