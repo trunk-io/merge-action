@@ -14,7 +14,7 @@ inputs:
   bazel-workspace-path:
     description:
       The path to the bazel WORKSPACE, relative to the root of the git repository. If unspecified,
-      defaults to the repo repository.
+      defaults to the root of the repository.
     required: false
   verbose:
     description: Whether to enable verbose logging. Defaults to false.
