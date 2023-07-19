@@ -17,13 +17,17 @@ if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
 	exit 2
 fi
 
+if [[ -z ${WORKSPACE_PATH} ]]; then
+	echo "Missing workspace path"
+	exit 2
+fi
+
 logIfVerbose "Fetching all remotes..."
 git fetch --all --quiet
 logIfVerbose "...done!"
 
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 curl -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
-workspace_path=$(pwd)
 
 git switch "${MERGE_INSTANCE_BRANCH}"
 git fetch --unshallow --quiet
@@ -59,11 +63,11 @@ impacted_targets_out=./impacted_targets_${pr_branch_head_sha}
 
 # Generate Hashes for the Merge Instance Branch
 git switch "${MERGE_INSTANCE_BRANCH}"
-java -jar bazel-diff.jar generate-hashes --workspacePath="${workspace_path}" "${merge_instance_branch_out}"
+java -jar bazel-diff.jar generate-hashes --workspacePath="${WORKSPACE_PATH}" "${merge_instance_branch_out}"
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
 git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH}"
-java -jar bazel-diff.jar generate-hashes --workspacePath="${workspace_path}" "${merge_instance_with_pr_branch_out}"
+java -jar bazel-diff.jar generate-hashes --workspacePath="${WORKSPACE_PATH}" "${merge_instance_with_pr_branch_out}"
 
 # Compute impacted targets
 java -jar bazel-diff.jar get-impacted-targets --startingHashes="${merge_instance_branch_out}" --finalHashes="${merge_instance_with_pr_branch_out}" --output="${impacted_targets_out}"
