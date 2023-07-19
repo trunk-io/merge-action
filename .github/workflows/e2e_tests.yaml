@@ -31,7 +31,9 @@ jobs:
           VERBOSE: 1
           WORKSPACE_PATH: ./tests/simple_bazel_workspace
 
-      - name: Validate Imapcted Targets Computation
+      - name: Validate Impacted Targets Computation
         shell: bash
         run: |
-          echo "Computed " (wc -l ${{ steps.compute.outputs.impacted_targets_out }}) " targets"
+          cat ${{ steps.compute.outputs.impacted_targets_out }}
+          computed_target_count=wc -l ${{ steps.compute.outputs.impacted_targets_out }}
+          echo $computed_target_count
