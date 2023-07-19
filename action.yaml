@@ -30,6 +30,7 @@ runs:
         java-version: "17"
 
     - name: Setup Bazel
+      # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
       uses: bazelbuild/setup-bazelisk@v2
 
     - name: Setup Tools
