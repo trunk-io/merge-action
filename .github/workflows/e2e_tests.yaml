@@ -1,7 +1,7 @@
 name: Pull Request
 on: pull_request
 
-# trunk-ignore(checkov/CKV2_GHA_1) FOR NOW
+permissions: read-all
 
 jobs:
   tests:
