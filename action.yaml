@@ -56,7 +56,7 @@ runs:
         MERGE_INSTANCE_BRANCH: ${{ steps.prerequisites.outputs.merge_instance_branch }}
         PR_BRANCH: ${{ github.head_ref }}
         VERBOSE: ${{ inputs.verbose }}
-        WORKSPACE_PATH: ${{ steps.prerequisites.outputs.workspace-path }}
+        WORKSPACE_PATH: ${{ steps.prerequisites.outputs.workspace_path }}
 
     - name: Upload Impacted Targets
       run: ${GITHUB_ACTION_PATH}/src/scripts/upload_impacted_targets.sh
