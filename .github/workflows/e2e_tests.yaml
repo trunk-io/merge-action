@@ -34,6 +34,7 @@ jobs:
       - name: Validate Impacted Targets Computation
         shell: bash
         run: |
-          if [[ (cat ${{ steps.compute.outputs.impacted_targets_out }} | wc -l) -ne 2 ]]; then
+          target_count=`cat ${{ steps.compute.outputs.impacted_targets_out }} | wc -l`
+          if [[ $target_count -ne 2 ]]; then
             exit 1
           fi
