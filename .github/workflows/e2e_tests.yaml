@@ -1,0 +1,29 @@
+name: Pull Request
+on: pull_request
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    name: E2E Tests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: oracle
+          java-version: "17"
+
+      - name: Setup Bazel
+        # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
+        uses: bazelbuild/setup-bazelisk@v2
+
+      - name: Compute Impacted Targets
+        run: ${GITHUB_ACTION_PATH}/src/scripts/compute_impacted_targets.sh
+        shell: bash
+        env:
+          MERGE_INSTANCE_BRANCH: main
+          PR_BRANCH: do_not_delete/stable_test_branch
+          VERBOSE: 1
+          WORKSPACE_PATH: ${GITHUB_ACTION_PATH}/tests/simple_bazel_workspace
