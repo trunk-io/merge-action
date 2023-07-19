@@ -22,6 +22,7 @@ jobs:
         uses: bazelbuild/setup-bazelisk@v2
 
       - name: Compute Impacted Targets
+        id: compute
         run: ./src/scripts/compute_impacted_targets.sh
         shell: bash
         env:
@@ -29,3 +30,8 @@ jobs:
           PR_BRANCH: do_not_delete/stable_test_branch
           VERBOSE: 1
           WORKSPACE_PATH: ./tests/simple_bazel_workspace
+
+      - name: Validate Imapcted Targets Computation
+        shell: bash
+        run: |
+          echo "Computed " (wc -l ${{ steps.compute.outputs.impacted_targets_out }}) " targets"
