@@ -1,0 +1,40 @@
+name: Pull Request
+on: pull_request
+
+permissions: read-all
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    name: E2E Tests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: oracle
+          java-version: "17"
+
+      - name: Setup Bazel
+        # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
+        uses: bazelbuild/setup-bazelisk@v2
+
+      - name: Compute Impacted Targets
+        id: compute
+        run: ./src/scripts/compute_impacted_targets.sh
+        shell: bash
+        env:
+          MERGE_INSTANCE_BRANCH: main
+          PR_BRANCH: do_not_delete/stable_test_branch
+          VERBOSE: 1
+          WORKSPACE_PATH: ./tests/simple_bazel_workspace
+
+      - name: Validate Impacted Targets Computation
+        shell: bash
+        run: |
+          target_count=`cat ${{ steps.compute.outputs.impacted_targets_out }} | wc -l`
+          if [[ $target_count -ne 2 ]]; then
+            exit 1
+          fi
