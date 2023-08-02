@@ -57,20 +57,21 @@ git switch "${PR_BRANCH}"
 ifVerbose git log -n "${pr_depth}" --oneline
 
 # Output Files
-merge_instance_branch_out=./${merge_instance_branch_head_sha}
+pr_branch_out=./${pr_branch_head_sha}
 merge_instance_with_pr_branch_out=./${pr_branch_head_sha}_${merge_instance_branch_head_sha}
 impacted_targets_out=./impacted_targets_${pr_branch_head_sha}
 
-# Generate Hashes for the Merge Instance Branch
-git switch "${MERGE_INSTANCE_BRANCH}"
-java -jar bazel-diff.jar generate-hashes --workspacePath="${WORKSPACE_PATH}" "${merge_instance_branch_out}"
+# Generate Hashes for the PR Branch
+git switch "${PR_BRANCH}"
+java -jar bazel-diff.jar generate-hashes --workspacePath="${WORKSPACE_PATH}" "${pr_branch_out}"
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
+git switch "${MERGE_INSTANCE_BRANCH}"
 git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH}"
 java -jar bazel-diff.jar generate-hashes --workspacePath="${WORKSPACE_PATH}" "${merge_instance_with_pr_branch_out}"
 
 # Compute impacted targets
-java -jar bazel-diff.jar get-impacted-targets --startingHashes="${merge_instance_branch_out}" --finalHashes="${merge_instance_with_pr_branch_out}" --output="${impacted_targets_out}"
+java -jar bazel-diff.jar get-impacted-targets --startingHashes="${pr_branch_out}" --finalHashes="${merge_instance_with_pr_branch_out}" --output="${impacted_targets_out}"
 
 num_impacted_targets=$(wc -l <"${impacted_targets_out}")
 echo "Computed ${num_impacted_targets} targets for sha ${pr_branch_head_sha}"
