@@ -27,7 +27,7 @@ git fetch --all --quiet
 logIfVerbose "...done!"
 
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
-curl -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
+curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
 
 git switch "${MERGE_INSTANCE_BRANCH}"
 git fetch --unshallow --quiet
