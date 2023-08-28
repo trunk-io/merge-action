@@ -33,11 +33,9 @@ runs:
       # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
       uses: bazelbuild/setup-bazelisk@v2
 
-    - name: Setup Tools
-      shell: bash
-      run: |
-        sudo apt-get update
-        sudo apt-get install jq
+    - name: Setup jq
+      # trunk-ignore(semgrep): Trust third-party action to install JQ. Source code: https://github.com/dcarbone/install-jq-action/
+      uses: dcarbone/install-jq-action@v1.0.1
 
     - name: Prerequisites
       id: prerequisites
