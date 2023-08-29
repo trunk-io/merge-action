@@ -77,8 +77,7 @@ git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash
 java -jar bazel-diff.jar generate-hashes --workspacePath="${WORKSPACE_PATH}" "${merge_instance_with_pr_branch_out}" --output_base=1
 
 # Compute impacted targets
-java -jar bazel-diff.jar get-impacted-targets --startingHashes="${merge_instance_branch_out}" --finalHashes="${merge_instance_with_pr_branch_out}" --output="${impacted_targets_out}"
-
+java -jar bazel-diff.jar get-impacted-targets --startingHashes="${merge_instance_branch_out}" --finalHashes="${merge_instance_with_pr_branch_out}"
 num_impacted_targets=$(wc -l <"${impacted_targets_out}")
 echo "Computed ${num_impacted_targets} targets for sha ${pr_branch_head_sha}"
 
