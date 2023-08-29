@@ -36,7 +36,8 @@ fetchRemoteGitHistory "${MERGE_INSTANCE_BRANCH}"
 fetchRemoteGitHistory "${PR_BRANCH}"
 
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
-curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
+curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/download/4.8.0/bazel-diff_deploy.jar
+java -jar bazel-diff.jar -V
 
 git switch "${MERGE_INSTANCE_BRANCH}"
 merge_instance_branch_head_sha=$(git rev-parse "${MERGE_INSTANCE_BRANCH}")
