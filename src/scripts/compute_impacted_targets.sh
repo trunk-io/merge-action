@@ -35,27 +35,24 @@ curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/
 fetchRemoteGitHistory "${MERGE_INSTANCE_BRANCH}"
 fetchRemoteGitHistory "${PR_BRANCH}"
 
+# Log the tip of the merge instance and PR branches.
 merge_instance_branch_head_sha=$(git rev-parse "${MERGE_INSTANCE_BRANCH}")
 logIfVerbose "Merge Instance Branch Head= ${merge_instance_branch_head_sha}"
-
 pr_branch_head_sha=$(git rev-parse "${PR_BRANCH}")
 logIfVerbose "PR Branch Head= ${pr_branch_head_sha}"
 
-# Find the merge base of the two branches
+# Log the commits between the merge base and the merge instance's HEAD.
+git switch "${PR_BRANCH}"
 merge_base_sha=$(git merge-base "${merge_instance_branch_head_sha}" "${pr_branch_head_sha}")
 logIfVerbose "Merge Base= ${merge_base_sha}"
-
-# Find the number of commits between the merge base and the merge instance's HEAD
 merge_instance_depth=$(git rev-list "${merge_base_sha}".."${merge_instance_branch_head_sha}" | wc -l)
 logIfVerbose "Merge Instance Depth= ${merge_instance_depth}"
-
 git switch "${MERGE_INSTANCE_BRANCH}"
 ifVerbose git log -n "${merge_instance_depth}" --oneline
 
-# Find the number of commits between the merge base and the PR's HEAD
+# Log the number of commits between the merge base and the PR's HEAD
 pr_depth=$(git rev-list "${merge_base_sha}".."${pr_branch_head_sha}" | wc -l)
 logIfVerbose "PR Depth= ${pr_depth}"
-
 git switch "${PR_BRANCH}"
 ifVerbose git log -n "${pr_depth}" --oneline
 
