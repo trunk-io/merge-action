@@ -9,7 +9,8 @@ ifVerbose() {
 }
 
 logIfVerbose() {
-	ifVerbose echo "$@"
+	# trunk-ignore(shellcheck/SC2312): Always query date with each echo statement.
+	ifVerbose echo "$(date -u)" "$@"
 }
 
 # NOTE: We cannot assume that the checked out Git repo (e.g. via actions-checkout)
