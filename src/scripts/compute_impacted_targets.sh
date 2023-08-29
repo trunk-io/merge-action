@@ -74,7 +74,7 @@ java -jar bazel-diff.jar generate-hashes --workspacePath="${WORKSPACE_PATH}" "${
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
 git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH}"
-java -jar bazel-diff.jar generate-hashes --workspacePath="${WORKSPACE_PATH}" "${merge_instance_with_pr_branch_out}" --output_base=1
+java -jar bazel-diff.jar generate-hashes --workspacePath="${WORKSPACE_PATH}" "${merge_instance_with_pr_branch_out}"
 
 # Compute impacted targets
 java -jar bazel-diff.jar get-impacted-targets --startingHashes="${merge_instance_branch_out}" --finalHashes="${merge_instance_with_pr_branch_out}"
