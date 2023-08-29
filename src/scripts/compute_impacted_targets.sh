@@ -29,10 +29,6 @@ if [[ -z ${WORKSPACE_PATH} ]]; then
 	exit 2
 fi
 
-logIfVerbose "Fetching all remotes..."
-git fetch --all --quiet
-logIfVerbose "...done!"
-
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
 
