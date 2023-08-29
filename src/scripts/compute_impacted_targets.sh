@@ -15,9 +15,9 @@ logIfVerbose() {
 
 bazelDiff() {
 	if [[ -n ${VERBOSE} ]]; then
-		java -jar bazel-diff.jar "$@"
-	else
 		java -jar bazel-diff.jar "$@" --verbose
+	else
+		java -jar bazel-diff.jar "$@"
 	fi
 }
 
