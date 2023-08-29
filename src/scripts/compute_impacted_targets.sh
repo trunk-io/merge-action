@@ -12,6 +12,15 @@ logIfVerbose() {
 	ifVerbose echo "$@"
 }
 
+# NOTE: We cannot assume that the checked out Git repo (e.g. via actions-checkout)
+# was a shallow vs a complete clone. The `--depth` options deepens the commit history
+# in both clone modes: https://git-scm.com/docs/fetch-options#Documentation/fetch-options.txt---depthltdepthgt
+fetchRemoteGitHistory() {
+	logIfVerbose "Fetching" "$@" "..."
+	git fetch --quiet --depth=2147483647 origin "$@"
+	logIfVerbose "...done!"
+}
+
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
 	echo "Missing branch"
 	exit 2
@@ -22,15 +31,13 @@ if [[ -z ${WORKSPACE_PATH} ]]; then
 	exit 2
 fi
 
-logIfVerbose "Fetching all remotes..."
-git fetch --all --quiet
-logIfVerbose "...done!"
+fetchRemoteGitHistory "${MERGE_INSTANCE_BRANCH}"
+fetchRemoteGitHistory "${PR_BRANCH}"
 
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
 
 git switch "${MERGE_INSTANCE_BRANCH}"
-git fetch --unshallow --quiet
 merge_instance_branch_head_sha=$(git rev-parse "${MERGE_INSTANCE_BRANCH}")
 logIfVerbose "Merge Instance Branch Head= ${merge_instance_branch_head_sha}"
 
