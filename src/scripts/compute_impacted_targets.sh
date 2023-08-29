@@ -12,6 +12,13 @@ logIfVerbose() {
 	ifVerbose echo "$@"
 }
 
+# NOTE: We cannot assume that the checked out Git repo (e.g. via actions-checkout)
+# was a shallow vs a complete clone. The `--depth` options deepens the commit history
+# in both clone modes: https://git-scm.com/docs/fetch-options#Documentation/fetch-options.txt---depthltdepthgt
+fetchRemoteGitHistory() {
+	git fetch --quiet --depth=2147483647 origin "$@"
+}
+
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
 	echo "Missing branch"
 	exit 2
@@ -29,12 +36,12 @@ logIfVerbose "...done!"
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
 
-git switch "${MERGE_INSTANCE_BRANCH}"
-git fetch --unshallow --quiet
+fetchRemoteGitHistory "${MERGE_INSTANCE_BRANCH}"
+fetchRemoteGitHistory "${PR_BRANCH}"
+
 merge_instance_branch_head_sha=$(git rev-parse "${MERGE_INSTANCE_BRANCH}")
 logIfVerbose "Merge Instance Branch Head= ${merge_instance_branch_head_sha}"
 
-git switch "${PR_BRANCH}"
 pr_branch_head_sha=$(git rev-parse "${PR_BRANCH}")
 logIfVerbose "PR Branch Head= ${pr_branch_head_sha}"
 
@@ -67,7 +74,7 @@ java -jar bazel-diff.jar generate-hashes --workspacePath="${WORKSPACE_PATH}" "${
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
 git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH}"
-java -jar bazel-diff.jar generate-hashes --workspacePath="${WORKSPACE_PATH}" "${merge_instance_with_pr_branch_out}"
+java -jar bazel-diff.jar generate-hashes --workspacePath="${WORKSPACE_PATH}" "${merge_instance_with_pr_branch_out}" --output_base=1
 
 # Compute impacted targets
 java -jar bazel-diff.jar get-impacted-targets --startingHashes="${merge_instance_branch_out}" --finalHashes="${merge_instance_with_pr_branch_out}" --output="${impacted_targets_out}"
