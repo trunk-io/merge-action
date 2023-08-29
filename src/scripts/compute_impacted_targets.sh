@@ -42,7 +42,6 @@ pr_branch_head_sha=$(git rev-parse "${PR_BRANCH}")
 logIfVerbose "PR Branch Head= ${pr_branch_head_sha}"
 
 # Log the commits between the merge base and the merge instance's HEAD.
-git switch "${PR_BRANCH}"
 merge_base_sha=$(git merge-base "${merge_instance_branch_head_sha}" "${pr_branch_head_sha}")
 logIfVerbose "Merge Base= ${merge_base_sha}"
 merge_instance_depth=$(git rev-list "${merge_base_sha}".."${merge_instance_branch_head_sha}" | wc -l)
