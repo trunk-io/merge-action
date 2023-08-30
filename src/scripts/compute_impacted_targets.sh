@@ -23,6 +23,15 @@ logIfVerbose() {
 	ifVerbose echo "$(date -u)" "$@"
 }
 
+# If specified, parse the Bazel startup options when generating hashes.
+logIfVerbose "Bazel startup options" "${BAZEL_STARTUP_OPTIONS}"
+if [[ -n ${VERBOSE} ]]; then
+	IFS=',' read -ra ADDR <<<"${BAZEL_STARTUP_OPTIONS}"
+	for i in "${ADDR[@]}"; do
+		echo "${i}"
+	done
+fi
+
 bazelDiff() {
 	if [[ -n ${VERBOSE} ]]; then
 		java -jar bazel-diff.jar "$@" --verbose
@@ -81,8 +90,6 @@ bazel --version
 merge_instance_branch_out=./${merge_instance_branch_head_sha}
 merge_instance_with_pr_branch_out=./${pr_branch_head_sha}_${merge_instance_branch_head_sha}
 impacted_targets_out=./impacted_targets_${pr_branch_head_sha}
-
-# If specified, parse the Bazel startup options when generating hashes.
 
 # Generate Hashes for the Merge Instance Branch
 git switch "${MERGE_INSTANCE_BRANCH}"
