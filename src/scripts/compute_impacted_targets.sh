@@ -32,7 +32,7 @@ logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
 bazelDiff() {
 	if [[ -n ${VERBOSE} ]]; then
-		java -jar bazel-diff.jar "$@"
+		java -jar bazel-diff.jar "$@" --verbose
 	else
 		java -jar bazel-diff.jar "$@"
 	fi
