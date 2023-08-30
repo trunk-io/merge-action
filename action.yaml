@@ -19,6 +19,12 @@ inputs:
   verbose:
     description: Whether to enable verbose logging. Defaults to false.
     required: false
+  bazel-startup-options:
+    description:
+      A comma separated list of startup options to pass to Bazel. See
+      https://bazel.build/reference/command-line-reference#startup-options for a complete list. If
+      unspecified, no startup options are specified.
+    required: false
 
 runs:
   using: composite
@@ -55,6 +61,7 @@ runs:
         PR_BRANCH: ${{ github.head_ref }}
         VERBOSE: ${{ inputs.verbose }}
         WORKSPACE_PATH: ${{ steps.prerequisites.outputs.workspace_path }}
+        BAZEL_STARTUP_OPTIONS: ${{ inputs.bazel-start-options }}
 
     - name: Upload Impacted Targets
       run: ${GITHUB_ACTION_PATH}/src/scripts/upload_impacted_targets.sh
