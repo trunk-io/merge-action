@@ -82,7 +82,7 @@ fi
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
 java -jar bazel-diff.jar -V
-bazel --version
+bazel "${bazel_startup_options}" --version
 
 # Output Files
 merge_instance_branch_out=./${merge_instance_branch_head_sha}
