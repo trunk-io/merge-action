@@ -6,7 +6,7 @@ permissions: read-all
 jobs:
   tests:
     runs-on: ubuntu-latest
-    name: E2E Tests
+    name: Compute Impacted Targets Tests
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -30,6 +30,7 @@ jobs:
           PR_BRANCH: do_not_delete/stable_test_branch
           VERBOSE: 1
           WORKSPACE_PATH: ./tests/simple_bazel_workspace
+          BAZEL_STARTUP_OPTIONS: --host_jvm_args=-Xmx12G,--block_for_lock
 
       - name: Validate Impacted Targets Computation
         shell: bash

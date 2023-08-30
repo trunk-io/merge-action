@@ -2,6 +2,16 @@
 
 set -euo pipefail
 
+if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
+	echo "Missing branch"
+	exit 2
+fi
+
+if [[ -z ${WORKSPACE_PATH} ]]; then
+	echo "Missing workspace path"
+	exit 2
+fi
+
 ifVerbose() {
 	if [[ -n ${VERBOSE} ]]; then
 		"$@"
@@ -12,6 +22,13 @@ logIfVerbose() {
 	# trunk-ignore(shellcheck/SC2312): Always query date with each echo statement.
 	ifVerbose echo "$(date -u)" "$@"
 }
+
+# If specified, parse the Bazel startup options when generating hashes.
+bazel_startup_options=""
+if [[ -n ${BAZEL_STARTUP_OPTIONS} ]]; then
+	bazel_startup_options=$(echo "${BAZEL_STARTUP_OPTIONS}" | tr ',' ' ')
+fi
+logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
 bazelDiff() {
 	if [[ -n ${VERBOSE} ]]; then
@@ -30,49 +47,43 @@ fetchRemoteGitHistory() {
 	logIfVerbose "...done!"
 }
 
-if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
-	echo "Missing branch"
-	exit 2
-fi
-
-if [[ -z ${WORKSPACE_PATH} ]]; then
-	echo "Missing workspace path"
-	exit 2
-fi
-
 fetchRemoteGitHistory "${MERGE_INSTANCE_BRANCH}"
 fetchRemoteGitHistory "${PR_BRANCH}"
+
+## Verbose logging for the Merge Instance and PR branch.
+if [[ -n ${VERBOSE} ]]; then
+	git switch "${MERGE_INSTANCE_BRANCH}"
+	merge_instance_branch_head_sha=$(git rev-parse "${MERGE_INSTANCE_BRANCH}")
+	echo "Merge Instance Branch Head= ${merge_instance_branch_head_sha}"
+
+	git switch "${PR_BRANCH}"
+	pr_branch_head_sha=$(git rev-parse "${PR_BRANCH}")
+	echo "PR Branch Head= ${pr_branch_head_sha}"
+
+	# Find the merge base of the two branches
+	merge_base_sha=$(git merge-base "${merge_instance_branch_head_sha}" "${pr_branch_head_sha}")
+	echo "Merge Base= ${merge_base_sha}"
+
+	# Find the number of commits between the merge base and the merge instance's HEAD
+	merge_instance_depth=$(git rev-list "${merge_base_sha}".."${merge_instance_branch_head_sha}" | wc -l)
+	echo "Merge Instance Depth= ${merge_instance_depth}"
+
+	git switch "${MERGE_INSTANCE_BRANCH}"
+	git log -n "${merge_instance_depth}" --oneline
+
+	# Find the number of commits between the merge base and the PR's HEAD
+	pr_depth=$(git rev-list "${merge_base_sha}".."${pr_branch_head_sha}" | wc -l)
+	echo "PR Depth= ${pr_depth}"
+
+	git switch "${PR_BRANCH}"
+	git log -n "${pr_depth}" --oneline
+fi
 
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
 java -jar bazel-diff.jar -V
-bazel --version
-
-git switch "${MERGE_INSTANCE_BRANCH}"
-merge_instance_branch_head_sha=$(git rev-parse "${MERGE_INSTANCE_BRANCH}")
-logIfVerbose "Merge Instance Branch Head= ${merge_instance_branch_head_sha}"
-
-git switch "${PR_BRANCH}"
-pr_branch_head_sha=$(git rev-parse "${PR_BRANCH}")
-logIfVerbose "PR Branch Head= ${pr_branch_head_sha}"
-
-# Find the merge base of the two branches
-merge_base_sha=$(git merge-base "${merge_instance_branch_head_sha}" "${pr_branch_head_sha}")
-logIfVerbose "Merge Base= ${merge_base_sha}"
-
-# Find the number of commits between the merge base and the merge instance's HEAD
-merge_instance_depth=$(git rev-list "${merge_base_sha}".."${merge_instance_branch_head_sha}" | wc -l)
-logIfVerbose "Merge Instance Depth= ${merge_instance_depth}"
-
-git switch "${MERGE_INSTANCE_BRANCH}"
-ifVerbose git log -n "${merge_instance_depth}" --oneline
-
-# Find the number of commits between the merge base and the PR's HEAD
-pr_depth=$(git rev-list "${merge_base_sha}".."${pr_branch_head_sha}" | wc -l)
-logIfVerbose "PR Depth= ${pr_depth}"
-
-git switch "${PR_BRANCH}"
-ifVerbose git log -n "${pr_depth}" --oneline
+# trunk-ignore(shellcheck/SC2086)
+bazel ${bazel_startup_options} version
 
 # Output Files
 merge_instance_branch_out=./${merge_instance_branch_head_sha}
@@ -81,11 +92,11 @@ impacted_targets_out=./impacted_targets_${pr_branch_head_sha}
 
 # Generate Hashes for the Merge Instance Branch
 git switch "${MERGE_INSTANCE_BRANCH}"
-bazelDiff generate-hashes --workspacePath="${WORKSPACE_PATH}" "${merge_instance_branch_out}"
+bazelDiff generate-hashes --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
 git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH}"
-bazelDiff generate-hashes --workspacePath="${WORKSPACE_PATH}" "${merge_instance_with_pr_branch_out}"
+bazelDiff generate-hashes --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
 
 # Compute impacted targets
 bazelDiff get-impacted-targets --startingHashes="${merge_instance_branch_out}" --finalHashes="${merge_instance_with_pr_branch_out}" --output="${impacted_targets_out}"
