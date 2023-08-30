@@ -25,11 +25,8 @@ logIfVerbose() {
 
 # If specified, parse the Bazel startup options when generating hashes.
 bazel_startup_options=""
-if [[ -n ${VERBOSE} ]]; then
-	IFS=',' read -ra ADDR <<<"${BAZEL_STARTUP_OPTIONS}"
-	for i in "${ADDR[@]}"; do
-		bazel_startup_options="-so=${i} ${bazel_startup_options} "
-	done
+if [[ -n ${BAZEL_STARTUP_OPTIONS} ]]; then
+	bazel_startup_options=$(echo "${BAZEL_STARTUP_OPTIONS}" | tr ',' ' ')
 fi
 logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
@@ -94,11 +91,11 @@ impacted_targets_out=./impacted_targets_${pr_branch_head_sha}
 
 # Generate Hashes for the Merge Instance Branch
 git switch "${MERGE_INSTANCE_BRANCH}"
-bazelDiff generate-hashes --workspacePath="${WORKSPACE_PATH}" "${bazel_startup_options}" "${merge_instance_branch_out}"
+bazelDiff generate-hashes --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
 git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH}"
-bazelDiff generate-hashes --workspacePath="${WORKSPACE_PATH}" "${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
+bazelDiff generate-hashes --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
 
 # Compute impacted targets
 bazelDiff get-impacted-targets --startingHashes="${merge_instance_branch_out}" --finalHashes="${merge_instance_with_pr_branch_out}" --output="${impacted_targets_out}"
