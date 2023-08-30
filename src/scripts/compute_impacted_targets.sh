@@ -24,6 +24,7 @@ logIfVerbose() {
 }
 
 # If specified, parse the Bazel startup options when generating hashes.
+# trunk-ignore(shellcheck/SC-2153): Correct spelling, passed in via env.
 logIfVerbose "Bazel startup options" "${BAZEL_STARTUP_OPTIONS}"
 bazel_startup_options=""
 if [[ -n ${VERBOSE} ]]; then
