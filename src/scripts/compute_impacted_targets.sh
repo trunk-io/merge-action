@@ -30,7 +30,7 @@ bazel_startup_options=""
 if [[ -n ${VERBOSE} ]]; then
 	IFS=',' read -ra ADDR <<<"${BAZEL_STARTUP_OPTIONS}"
 	for i in "${ADDR[@]}"; do
-		bazel_startup_options="${bazel_start_options} -so=${i}"
+		bazel_startup_options="${bazel_startup_options} -so=${i}"
 	done
 fi
 
