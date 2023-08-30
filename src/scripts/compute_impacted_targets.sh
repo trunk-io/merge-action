@@ -36,6 +36,7 @@ fi
 
 bazelDiff() {
 	if [[ -n ${VERBOSE} ]]; then
+		echo "Running command" "java -jar bazel-diff.jar" "$@" "--verbose"
 		java -jar bazel-diff.jar "$@" --verbose
 	else
 		java -jar bazel-diff.jar "$@"
