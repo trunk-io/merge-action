@@ -13,7 +13,7 @@ if [[ -z ${WORKSPACE_PATH} ]]; then
 fi
 
 cd "${WORKSPACE_PATH}"
-_java=$(bazel info java-home)/bin/java
+alias _java=$(bazel info java-home)/bin/java
 
 ifVerbose() {
 	if [[ -n ${VERBOSE} ]]; then
