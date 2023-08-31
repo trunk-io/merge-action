@@ -33,6 +33,7 @@ logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
 # trunk-ignore(shellcheck)
 alias _bazel=$(bazel "${bazel_startup_options}")
+_bazel
 
 # trunk-ignore(shellcheck)
 alias _java=$(_bazel info java-home)/bin/java
