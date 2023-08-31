@@ -50,16 +50,16 @@ fetchRemoteGitHistory() {
 fetchRemoteGitHistory "${MERGE_INSTANCE_BRANCH}"
 fetchRemoteGitHistory "${PR_BRANCH}"
 
+git switch "${MERGE_INSTANCE_BRANCH}"
+merge_instance_branch_head_sha=$(git rev-parse "${MERGE_INSTANCE_BRANCH}")
+ifVerbose echo "Merge Instance Branch Head= ${merge_instance_branch_head_sha}"
+
+git switch "${PR_BRANCH}"
+pr_branch_head_sha=$(git rev-parse "${PR_BRANCH}")
+ifVerbose echo "PR Branch Head= ${pr_branch_head_sha}"
+
 ## Verbose logging for the Merge Instance and PR branch.
 if [[ -n ${VERBOSE} ]]; then
-	git switch "${MERGE_INSTANCE_BRANCH}"
-	merge_instance_branch_head_sha=$(git rev-parse "${MERGE_INSTANCE_BRANCH}")
-	echo "Merge Instance Branch Head= ${merge_instance_branch_head_sha}"
-
-	git switch "${PR_BRANCH}"
-	pr_branch_head_sha=$(git rev-parse "${PR_BRANCH}")
-	echo "PR Branch Head= ${pr_branch_head_sha}"
-
 	# Find the merge base of the two branches
 	merge_base_sha=$(git merge-base "${merge_instance_branch_head_sha}" "${pr_branch_head_sha}")
 	echo "Merge Base= ${merge_base_sha}"
