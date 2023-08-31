@@ -15,6 +15,7 @@ fi
 cd "${WORKSPACE_PATH}"
 # trunk-ignore(shellcheck)
 alias _java=$(bazel info java-home)/bin/java
+_java
 
 ifVerbose() {
 	if [[ -n ${VERBOSE} ]]; then
