@@ -39,11 +39,15 @@ if [[ -n ${BAZEL_STARTUP_OPTIONS} ]]; then
 fi
 logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
+# Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
+curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
+_bazel_diff_jar=$(pwd)/bazel-diff.jar
+
 bazelDiff() {
 	if [[ -n ${VERBOSE} ]]; then
-		_java -jar bazel-diff.jar "$@" --verbose
+		_java -jar "${_bazel_diff_jar}" "$@" --verbose
 	else
-		_java -jar bazel-diff.jar "$@"
+		_java -jar "${_bazel_diff_jar}" "$@"
 	fi
 }
 
@@ -88,9 +92,7 @@ if [[ -n ${VERBOSE} ]]; then
 	git log -n "${pr_depth}" --oneline
 fi
 
-# Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
-curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
-_java -jar bazel-diff.jar -V
+_java -jar "${_bazel_diff_jar}" -V
 # trunk-ignore(shellcheck/SC2086)
 bazel ${bazel_startup_options} version
 
