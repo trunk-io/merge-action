@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+### This script is executed from the WORKSPACE root.
+
 set -euo pipefail
 
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
@@ -13,9 +15,11 @@ if [[ -z ${WORKSPACE_PATH} ]]; then
 fi
 
 cd "${WORKSPACE_PATH}"
-# trunk-ignore(shellcheck)
-alias _java=$(bazel info java-home)/bin/java
-_java
+
+_java() {
+	# trunk-ignore(shellcheck/SC2046)
+	$(bazel info java-home)/bin/java "$@"
+}
 
 ifVerbose() {
 	if [[ -n ${VERBOSE} ]]; then
