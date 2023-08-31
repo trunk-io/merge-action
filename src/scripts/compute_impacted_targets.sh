@@ -31,8 +31,8 @@ if [[ -n ${BAZEL_STARTUP_OPTIONS} ]]; then
 fi
 logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
-# trunk-ignore(shellcheck)
 _bazel() {
+	# trunk-ignore(shellcheck)
 	bazel ${bazel_startup_options} "$@"
 }
 
