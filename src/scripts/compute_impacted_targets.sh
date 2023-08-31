@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+shopt -s expand_aliases
 
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
 	echo "Missing branch"
@@ -30,11 +31,14 @@ if [[ -n ${BAZEL_STARTUP_OPTIONS} ]]; then
 fi
 logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
+# trunk-ignore(shellcheck)
+alias _java=$(bazel info java-home)/bin/java
+
 bazelDiff() {
 	if [[ -n ${VERBOSE} ]]; then
-		java -jar bazel-diff.jar "$@" --verbose
+		_java -jar bazel-diff.jar "$@" --verbose
 	else
-		java -jar bazel-diff.jar "$@"
+		_java -jar bazel-diff.jar "$@"
 	fi
 }
 
@@ -81,7 +85,7 @@ fi
 
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
-java -jar bazel-diff.jar -V
+_java -jar bazel-diff.jar -V
 # trunk-ignore(shellcheck/SC2086)
 bazel ${bazel_startup_options} version
 
