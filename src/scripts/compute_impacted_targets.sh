@@ -33,7 +33,7 @@ logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
 # trunk-ignore(shellcheck)
 _bazel() {
-	bazel ${startup_options} "$@"
+	bazel ${bazel_startup_options} "$@"
 }
 
 # trunk-ignore(shellcheck)
