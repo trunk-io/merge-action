@@ -12,6 +12,9 @@ if [[ -z ${WORKSPACE_PATH} ]]; then
 	exit 2
 fi
 
+cd "${WORKSPACE_PATH}"
+_java=$(bazel which java-home)/bin/java
+
 ifVerbose() {
 	if [[ -n ${VERBOSE} ]]; then
 		"$@"
@@ -32,9 +35,9 @@ logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
 bazelDiff() {
 	if [[ -n ${VERBOSE} ]]; then
-		java -jar bazel-diff.jar "$@" --verbose
+		_java -jar bazel-diff.jar "$@" --verbose
 	else
-		java -jar bazel-diff.jar "$@"
+		_java -jar bazel-diff.jar "$@"
 	fi
 }
 
@@ -81,8 +84,9 @@ fi
 
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
-java -jar bazel-diff.jar -V
-bazel version
+_java -jar bazel-diff.jar -V
+# trunk-ignore(shellcheck/SC2086)
+bazel ${bazel_startup_options} version
 
 # Output Files
 merge_instance_branch_out=./${merge_instance_branch_head_sha}
