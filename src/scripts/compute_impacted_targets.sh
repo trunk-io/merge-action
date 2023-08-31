@@ -23,7 +23,7 @@ logIfVerbose() {
 	ifVerbose echo "$(date -u)" "$@"
 }
 
-# If specified, parse the Bazel startup options when generating hashes.
+startup options when generating hashes.
 bazel_startup_options=""
 if [[ -n ${BAZEL_STARTUP_OPTIONS} ]]; then
 	bazel_startup_options=$(echo "${BAZEL_STARTUP_OPTIONS}" | tr ',' ' ')
@@ -82,10 +82,8 @@ fi
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
 java -jar bazel-diff.jar -V
-# trunk-ignore-begin(shellcheck/SC2086)
-bazel ${bazel_startup_options} version
-bazel ${bazel_startup_options} info
-# trunk-ignore-end(shellcheck/SC2086)
+# trunk-ignore(shellcheck/SC2086)
+bazel version
 
 # Output Files
 merge_instance_branch_out=./${merge_instance_branch_head_sha}
