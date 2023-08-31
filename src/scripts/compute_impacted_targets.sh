@@ -14,11 +14,13 @@ if [[ -z ${WORKSPACE_PATH} ]]; then
 	exit 2
 fi
 
-cd "${WORKSPACE_PATH}"
-
+# We rely on Bazel's bundled Java version to execute Java.
 _java() {
+	_old_path=$(pwd)
+	cd "${WORKSPACE_PATH}"
 	# trunk-ignore(shellcheck/SC2046)
 	$(bazel info java-home)/bin/java "$@"
+	cd "${_old_path}"
 }
 
 ifVerbose() {
