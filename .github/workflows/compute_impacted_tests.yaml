@@ -11,12 +11,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: oracle
-          java-version: "17"
-
       - name: Setup Bazel
         # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
         uses: bazelbuild/setup-bazelisk@v2

@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-### This script is executed from the WORKSPACE root.
-
 set -euo pipefail
 
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
