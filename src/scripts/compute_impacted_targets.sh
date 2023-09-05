@@ -33,7 +33,7 @@ logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
 # TODO: Grab latest.
 # TODO: Grab version based off arch.
-curl --retry 5 -Lo bazel-differ https://github.com/ewhauser/bazel-differ/releases/download/v0.0.7/bazel-differ-linux-arm64
+curl --retry 5 -Lo bazel-differ https://github.com/ewhauser/bazel-differ/releases/download/v0.0.7/bazel-differ-linux-x86_64
 chmod +x ./bazel-differ
 
 bazelDiffer() {
