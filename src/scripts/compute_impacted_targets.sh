@@ -92,11 +92,11 @@ impacted_targets_out=./impacted_targets_${pr_branch_head_sha}
 
 # Generate Hashes for the Merge Instance Branch
 git switch "${MERGE_INSTANCE_BRANCH}"
-bazelDiffer generate-hashes --workspacePath="${WORKSPACE_PATH}" "--bazelStartupOptions=${bazel_startup_options}" --finalHashes="${merge_instance_branch_out}"
+bazelDiffer generate-hashes --workspacePath="${WORKSPACE_PATH}" "--bazelStartupOptions=${bazel_startup_options}" "${merge_instance_branch_out}"
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
 git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH}"
-bazelDiffer generate-hashes --workspacePath="${WORKSPACE_PATH}" "--bazelStartupOptions=${bazel_startup_options}" --finalHashes="${merge_instance_with_pr_branch_out}"
+bazelDiffer generate-hashes --workspacePath="${WORKSPACE_PATH}" "--bazelStartupOptions=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
 
 # Compute impacted targets
 bazelDiffer diff --startingHashes="${merge_instance_branch_out}" --finalHashes="${merge_instance_with_pr_branch_out}" --output="${impacted_targets_out}"
