@@ -18,6 +18,10 @@ if [[ -z ${workspace_path} ]]; then
 	workspace_path=$(pwd)
 fi
 
+arch=$(uname -m)
+
 # Outputs
+# trunk-ignore(shellcheck/SC2129)
 echo "merge_instance_branch=${merge_instance_branch}" >>"${GITHUB_OUTPUT}"
 echo "workspace_path=${workspace_path}" >>"${GITHUB_OUTPUT}"
+echo "arch=${arch}" >>"${GITHUB_OUTPUT}"
