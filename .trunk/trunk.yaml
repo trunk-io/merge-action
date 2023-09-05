@@ -25,3 +25,6 @@ runtimes:
   enabled:
     - node@18.12.1
     - python@3.10.8
+tools:
+  enabled:
+    - bazel-differ@0.0.7
