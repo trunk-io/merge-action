@@ -31,19 +31,16 @@ if [[ -n ${BAZEL_STARTUP_OPTIONS} ]]; then
 fi
 logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
-_bazel() {
-	# trunk-ignore(shellcheck)
-	bazel ${bazel_startup_options} "$@"
-}
+# TODO: Grab latest.
+# TODO: Grab version based off arch.
+curl --retry 5 -Lo bazel-differ https://github.com/ewhauser/bazel-differ/releases/download/v0.0.7/bazel-differ-linux-arm64
+chmod +x ./bazel-differ
 
-# trunk-ignore(shellcheck)
-alias _java=$(_bazel info java-home)/bin/java
-
-bazelDiff() {
+bazelDiffer() {
 	if [[ -n ${VERBOSE} ]]; then
-		_java -jar bazel-diff.jar "$@" --verbose
+		bazel-differ "$@" --verbose
 	else
-		_java -jar bazel-diff.jar "$@"
+		bazel-differ "$@"
 	fi
 }
 
@@ -100,14 +97,14 @@ impacted_targets_out=./impacted_targets_${pr_branch_head_sha}
 
 # Generate Hashes for the Merge Instance Branch
 git switch "${MERGE_INSTANCE_BRANCH}"
-bazelDiff generate-hashes --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
+bazelDiffer generate-hashes --workspacePath="${WORKSPACE_PATH}" "--bazelStartupOptions=${bazel_startup_options}" --finalHashes="${merge_instance_branch_out}"
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
 git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH}"
-bazelDiff generate-hashes --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
+bazelDiffer generate-hashes --workspacePath="${WORKSPACE_PATH}" "--bazelStartupOptions=${bazel_startup_options}" --finalHashes="${merge_instance_with_pr_branch_out}"
 
 # Compute impacted targets
-bazelDiff get-impacted-targets --startingHashes="${merge_instance_branch_out}" --finalHashes="${merge_instance_with_pr_branch_out}" --output="${impacted_targets_out}"
+bazelDiffer diff --startingHashes="${merge_instance_branch_out}" --finalHashes="${merge_instance_with_pr_branch_out}" --output="${impacted_targets_out}"
 
 num_impacted_targets=$(wc -l <"${impacted_targets_out}")
 echo "Computed ${num_impacted_targets} targets for sha ${pr_branch_head_sha}"
