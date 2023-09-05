@@ -60,6 +60,7 @@ define your own suite of impacted targets using glob-based targets.
 
 ### Under the hood: Bazel
 
-We use Tinder's [bazel-diff](https://github.com/Tinder/bazel-diff) tool to compute the impacted
-targets of a particular PR. The tool computes a mapping of package --> hash at the source and dest
-shas, then reports any packages which have a differing hash.
+We use [bazel-differ](https://github.com/ewhauser/bazel-differ), a port of Tinder's
+[bazel-diff](https://github.com/tinder/bazel-diff) to compute the impacted targets of a particular
+PR. The tool computes a mapping of package --> hash at the source and dest shas, then reports any
+packages which have a differing hash.
