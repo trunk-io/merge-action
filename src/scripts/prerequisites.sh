@@ -18,6 +18,18 @@ if [[ -z ${workspace_path} ]]; then
 	workspace_path=$(pwd)
 fi
 
+arch=""
+if (uname -a | grep arm64); then
+	arch="arm64"
+elif (uname -a | grep x86_64); then
+	arch="x86_64"
+else
+	echo "Could not determine architecture"
+	exit 2
+fi
+
 # Outputs
+# trunk-ignore(shellcheck/SC2129)
 echo "merge_instance_branch=${merge_instance_branch}" >>"${GITHUB_OUTPUT}"
 echo "workspace_path=${workspace_path}" >>"${GITHUB_OUTPUT}"
+echo "arch=${arch}" >>"${GITHUB_OUTPUT}"

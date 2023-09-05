@@ -13,6 +13,11 @@ if [[ -z ${WORKSPACE_PATH} ]]; then
 	exit 2
 fi
 
+if [[ -z ${ARCH} ]]; then
+	echo "Missing architecture"
+	exit 2
+fi
+
 ifVerbose() {
 	if [[ -n ${VERBOSE} ]]; then
 		"$@"
@@ -31,9 +36,7 @@ if [[ -n ${BAZEL_STARTUP_OPTIONS} ]]; then
 fi
 logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
-# TODO: Grab latest.
-# TODO: Grab version based off arch.
-curl --retry 5 -Lo bazel-differ https://github.com/ewhauser/bazel-differ/releases/download/v0.0.7/bazel-differ-linux-x86_64
+curl --retry 5 -Lo bazel-differ "https://github.com/ewhauser/bazel-differ/releases/latest/download/bazel-differ-linux-${ARCH}"
 chmod +x ./bazel-differ
 
 bazelDiffer() {
