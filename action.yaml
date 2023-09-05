@@ -55,7 +55,6 @@ runs:
         PR_BRANCH: ${{ github.head_ref }}
         VERBOSE: ${{ inputs.verbose }}
         WORKSPACE_PATH: ${{ steps.prerequisites.outputs.workspace_path }}
-        ARCH: ${{ steps.prerequisites.outputs.arch }}
         BAZEL_STARTUP_OPTIONS: ${{ inputs.bazel-startup-options }}
 
     - name: Upload Impacted Targets
