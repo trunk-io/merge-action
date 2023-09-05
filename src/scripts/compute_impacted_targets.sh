@@ -38,9 +38,9 @@ chmod +x ./bazel-differ
 
 bazelDiffer() {
 	if [[ -n ${VERBOSE} ]]; then
-		bazel-differ "$@" --verbose
+		./bazel-differ "$@" --verbose
 	else
-		bazel-differ "$@"
+		./bazel-differ "$@"
 	fi
 }
 
