@@ -31,9 +31,10 @@ if [[ -n ${BAZEL_STARTUP_OPTIONS} ]]; then
 fi
 logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
-# trunk-ignore(shellcheck/SC2153): Passed in as env variable
-bazel_path="${BAZEL_PATH}"
-if [[ -z ${bazel_path} ]]; then
+bazel_path=""
+if [[ -n ${BAZEL_PATH} ]]; then
+	bazel_path="${BAZEL_PATH}"
+else
 	bazel_path=$(command -v bazel)
 fi
 
@@ -97,7 +98,7 @@ fi
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
 _java -jar bazel-diff.jar -V
-bazel version # Does not require running with startup options.
+_bazel version # Does not require running with startup options.
 
 # Output Files
 merge_instance_branch_out=./${merge_instance_branch_head_sha}
