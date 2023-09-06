@@ -31,12 +31,7 @@ if [[ -n ${BAZEL_STARTUP_OPTIONS} ]]; then
 fi
 logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
-bazel_path=""
-if [[ -n ${BAZEL_PATH} ]]; then
-	bazel_path="${BAZEL_PATH}"
-else
-	bazel_path=$(command -v bazel)
-fi
+bazel_path="${BAZELPATH:-$(command -v bazel)}"
 
 _bazel() {
 	# trunk-ignore(shellcheck)
