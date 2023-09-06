@@ -25,18 +25,14 @@ inputs:
       https://bazel.build/reference/command-line-reference#startup-options for a complete list. If
       unspecified, no startup options are specified.
     required: false
+  bazel-path:
+    description: A path to the Bazel executable. Defaults to PATH.
+    required: false
+    default: bazel
 
 runs:
   using: composite
   steps:
-    - name: Setup Bazel
-      # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
-      uses: bazelbuild/setup-bazelisk@v2
-
-    - name: Setup jq
-      # trunk-ignore(semgrep): Trust third-party action to install JQ. Source code: https://github.com/dcarbone/install-jq-action/
-      uses: dcarbone/install-jq-action@v1.0.1
-
     - name: Prerequisites
       id: prerequisites
       run: ${GITHUB_ACTION_PATH}/src/scripts/prerequisites.sh
@@ -45,6 +41,16 @@ runs:
         DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         TARGET_BRANCH: ${{ inputs.target-branch }}
         WORKSPACE_PATH: ${{ inputs.bazel-workspace-path }}
+        BAZEL_PATH: ${{ inputs.bazel-path }}
+
+    - name: Install Bazel in PATH
+      if: ${{ steps.prerequisites.outputs.requires_default_bazel_installation == 'true' }}
+      # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
+      uses: bazelbuild/setup-bazelisk@v2
+
+    - name: Setup jq
+      # trunk-ignore(semgrep): Trust third-party action to install JQ. Source code: https://github.com/dcarbone/install-jq-action/
+      uses: dcarbone/install-jq-action@v1.0.1
 
     - name: Compute Impacted Targets
       id: compute-impacted-targets
@@ -55,6 +61,7 @@ runs:
         PR_BRANCH: ${{ github.head_ref }}
         VERBOSE: ${{ inputs.verbose }}
         WORKSPACE_PATH: ${{ steps.prerequisites.outputs.workspace_path }}
+        BAZEL_PATH: ${{ inputs.bazel-path }}
         BAZEL_STARTUP_OPTIONS: ${{ inputs.bazel-startup-options }}
 
     - name: Upload Impacted Targets

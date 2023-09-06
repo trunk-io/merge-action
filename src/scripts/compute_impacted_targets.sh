@@ -33,7 +33,7 @@ logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
 _bazel() {
 	# trunk-ignore(shellcheck)
-	bazel ${bazel_startup_options} "$@"
+	${BAZEL_PATH} ${bazel_startup_options} "$@"
 }
 
 # trunk-ignore(shellcheck)
@@ -91,7 +91,7 @@ fi
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
 _java -jar bazel-diff.jar -V
-bazel version # Does not require running with startup options.
+_bazel version # Does not require running with startup options.
 
 # Output Files
 merge_instance_branch_out=./${merge_instance_branch_head_sha}
@@ -100,11 +100,11 @@ impacted_targets_out=./impacted_targets_${pr_branch_head_sha}
 
 # Generate Hashes for the Merge Instance Branch
 git switch "${MERGE_INSTANCE_BRANCH}"
-bazelDiff generate-hashes --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
+bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
 git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH}"
-bazelDiff generate-hashes --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
+bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
 
 # Compute impacted targets
 bazelDiff get-impacted-targets --startingHashes="${merge_instance_branch_out}" --finalHashes="${merge_instance_with_pr_branch_out}" --output="${impacted_targets_out}"
