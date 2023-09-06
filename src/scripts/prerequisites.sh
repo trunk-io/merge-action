@@ -20,6 +20,8 @@ fi
 
 requires_default_bazel_installation="false"
 if [[ ${BAZEL_PATH} == "bazel" ]]; then
+	# DO NOT LAND
+	command -v bazel
 	if ! command -v bazel; then
 		requires_default_bazel_installation="true"
 	fi
