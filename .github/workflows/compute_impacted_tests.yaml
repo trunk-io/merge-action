@@ -25,6 +25,7 @@ jobs:
           VERBOSE: 1
           WORKSPACE_PATH: ./tests/simple_bazel_workspace
           BAZEL_STARTUP_OPTIONS: --host_jvm_args=-Xmx12G,--block_for_lock,--client_debug
+          BAZEL_PATH: bazel
 
       - name: Validate Impacted Targets Computation
         shell: bash
