@@ -36,8 +36,9 @@ _bazel() {
 	${BAZEL_PATH} ${bazel_startup_options} "$@"
 }
 
-# trunk-ignore(shellcheck)
-alias _java=$(_bazel info java-home)/bin/java
+_java() {
+	"$(_bazel info java-home)"/bin/java "$@"
+}
 
 bazelDiff() {
 	if [[ -n ${VERBOSE} ]]; then
