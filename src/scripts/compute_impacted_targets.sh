@@ -32,8 +32,14 @@ fi
 logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
 _bazel() {
+	# trunk-ignore(shellcheck/SC2153): Passed in as env variable
+	bazel_path="${BAZEL_PATH}"
+	if [[ -z ${bazel_path} ]]; then
+		bazel_path=$(command -v bazel)
+	fi
+
 	# trunk-ignore(shellcheck)
-	bazel ${bazel_startup_options} "$@"
+	${bazel_path} ${bazel_startup_options} "$@"
 }
 
 # trunk-ignore(shellcheck)

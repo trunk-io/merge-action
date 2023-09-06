@@ -25,6 +25,9 @@ inputs:
       https://bazel.build/reference/command-line-reference#startup-options for a complete list. If
       unspecified, no startup options are specified.
     required: false
+  bazel-path:
+    description: A path to the Bazel executable. Defaults to PATH.
+    required: false
 
 runs:
   using: composite
@@ -55,6 +58,7 @@ runs:
         PR_BRANCH: ${{ github.head_ref }}
         VERBOSE: ${{ inputs.verbose }}
         WORKSPACE_PATH: ${{ steps.prerequisites.outputs.workspace_path }}
+        BAZEL_PATH: ${{ inputs.bazel-path }}
         BAZEL_STARTUP_OPTIONS: ${{ inputs.bazel-startup-options }}
 
     - name: Upload Impacted Targets
