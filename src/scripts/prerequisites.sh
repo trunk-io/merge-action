@@ -21,11 +21,7 @@ fi
 requires_default_bazel_installation="false"
 if [[ ${BAZEL_PATH} == "bazel" ]]; then
 	if ! command -v bazel; then
-		echo "requires bazel installation"
 		requires_default_bazel_installation="true"
-	else
-		echo "does not require bazel installation"
-		# DO NOT LAND
 	fi
 fi
 
