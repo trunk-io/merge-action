@@ -88,13 +88,10 @@ if [[ -n ${VERBOSE} ]]; then
 	git log -n "${pr_depth}" --oneline
 fi
 
-pwd
-ls -R
-
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
-_java -jar bazel-diff.jar -V
 _bazel version # Does not require running with startup options.
+_java -jar bazel-diff.jar -V
 
 # Output Files
 merge_instance_branch_out=./${merge_instance_branch_head_sha}
