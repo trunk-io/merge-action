@@ -33,7 +33,7 @@ runs:
   using: composite
   steps:
     - name: Setup Bazel
-      if: ${{ inputs.bazel-path == '' }} # If unspecified, use the provided Bazel and skip installation.
+      if: ${{ inputs.bazel-path == '' }}
       # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
       uses: bazelbuild/setup-bazelisk@v2
 
