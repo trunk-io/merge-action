@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-shopt -s expand_aliases
 
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
 	echo "Missing branch"
@@ -36,8 +35,10 @@ _bazel() {
 	${BAZEL_PATH} ${bazel_startup_options} "$@"
 }
 
-# trunk-ignore(shellcheck)
-alias _java=$(_bazel info java-home)/bin/java
+_java() {
+	# trunk-ignore(shellcheck/SC2046)
+	$(_bazel info java-home)/bin/java "$@"
+}
 
 bazelDiff() {
 	if [[ -n ${VERBOSE} ]]; then
