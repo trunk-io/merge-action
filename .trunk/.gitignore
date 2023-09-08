@@ -2,9 +2,7 @@
 *logs
 *actions
 *notifications
+*tools
 plugins
 user_trunk.yaml
 user.yaml
-# TODO(lauri): Remove shims after a release or two
-shims
-tools
