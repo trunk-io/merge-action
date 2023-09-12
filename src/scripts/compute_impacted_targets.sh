@@ -14,7 +14,7 @@ if [[ -z ${WORKSPACE_PATH} ]]; then
 fi
 
 if [[ (-z ${MERGE_INSTANCE_BRANCH_HEAD_SHA}) || (-z ${PR_BRANCH_HEAD_SHA}) ]]; then
-	echo "Missing branch"
+	echo "Missing sha"
 	exit 2
 fi
 
