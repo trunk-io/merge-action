@@ -3,6 +3,8 @@
 set -euo pipefail
 shopt -s expand_aliases
 
+git config --global credential.helper store
+
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
 	echo "Missing branch"
 	exit 2
