@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Compute Impacted Targets
-        uses: trunk-io/merge-action@2a9433fae028ffe38ce139390e23dc2fd4a39e7a
+        uses: trunk-io/merge-action@4a453c44d74173e20e3b079bd02d8bc966c6bb5f
         with:
           ### Use your repositories API token to authenticate impacted targets uploads.
           trunk-token: ${{ secrets.TRUNK_REPO_API_TOKEN }}
