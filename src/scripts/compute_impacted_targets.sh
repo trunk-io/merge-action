@@ -4,6 +4,7 @@ set -euo pipefail
 shopt -s expand_aliases
 
 git clone https://github.com/trunk-io/merge-action.git
+cd merge-action
 
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
 	echo "Missing branch"
