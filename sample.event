@@ -1,7 +1,7 @@
 {
   "pull_request": {
     "head": {
-      "ref": "nikhil/act"
+      "ref": "do_not_delete/stable_test_branch"
     },
     "base": {
       "ref": "sample-base-ref"
