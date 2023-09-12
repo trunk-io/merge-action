@@ -97,6 +97,7 @@ fi
 
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
+cd "${WORKSPACE_PATH}"
 _java -jar bazel-diff.jar -V
 _bazel version # Does not require running with startup options.
 
@@ -107,9 +108,6 @@ impacted_targets_out=./impacted_targets_${pr_branch_head_sha}
 
 # Generate Hashes for the Merge Instance Branch
 git switch "${MERGE_INSTANCE_BRANCH}"
-cd "${WORKSPACE_PATH}"
-pwd
-ls -alr
 bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="." "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
