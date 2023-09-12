@@ -4,10 +4,8 @@ set -euo pipefail
 shopt -s expand_aliases
 
 git clone https://github.com/trunk-io/merge-action.git
-ls -ar
 cd merge-action
-pwd
-ls -ar
+cd "${WORKSPACE_PATH}"
 
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
 	echo "Missing branch"
@@ -46,10 +44,7 @@ _bazel() {
 
 # trunk-ignore(shellcheck)
 _java() {
-	old_path=$(pwd)
-	cd "${WORKSPACE_PATH}"
 	$(_bazel info java-home)/bin/java "$@"
-	cd "${old_path}"
 }
 
 bazelDiff() {
@@ -69,10 +64,6 @@ fetchRemoteGitHistory() {
 	logIfVerbose "...done!"
 }
 
-pwd
-ls -a
-git status
-git remote show origin
 fetchRemoteGitHistory "${MERGE_INSTANCE_BRANCH}"
 fetchRemoteGitHistory "${PR_BRANCH}"
 
