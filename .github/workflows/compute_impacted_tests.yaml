@@ -24,7 +24,7 @@ jobs:
           DEFAULT_BRANCH: main
           WORKSPACE_PATH: ./tests_simple_bazel_workspace
           BAZEL_PATH: bazel
-          PR_BRANCH: do_not_delete/test_branch
+          PR_BRANCH: do_not_delete/stable_test_branch
 
       - name: Compute Impacted Targets
         id: compute
