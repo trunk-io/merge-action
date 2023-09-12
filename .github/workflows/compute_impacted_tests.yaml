@@ -15,13 +15,24 @@ jobs:
         # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
         uses: bazelbuild/setup-bazelisk@v2
 
+      - name: Prerequisites
+        id: prerequisites
+        run: ./src/scripts/prerequisites.sh
+        shell: bash
+        env:
+          DEFAULT_BRANCH: main
+          WORKSPACE_PATH: ./tests_simple_bazel_workspace
+          BAZEL_PATH: bazel
+          PR_BRANCH: do_not_delete/test_branch
+
       - name: Compute Impacted Targets
         id: compute
         run: ./src/scripts/compute_impacted_targets.sh
         shell: bash
         env:
           MERGE_INSTANCE_BRANCH: main
-          MERGE_INSTANCE_BRANCH_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          MERGE_INSTANCE_BRANCH_HEAD_SHA:
+            ${{ steps.prerequisites.outputs.merge_instance_branch_head_sha }}
           PR_BRANCH: do_not_delete/stable_test_branch
           PR_BRANCH_HEAD_SHA: 097c8259c2e18da92f6189849ebc0f7f6dc624e5 # stable
           VERBOSE: 1
