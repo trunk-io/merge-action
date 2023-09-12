@@ -2,9 +2,10 @@
 
 set -euo pipefail
 
-echo "${TARGET_BRANCH}"
-echo "${MERGE_INSTANCE_BRANCH}"
-echo "${DEFAULT_BRANCH}"
+echo "DEFAULT BRANCH" "${DEFAULT_BRANCH}"
+echo "TARGET BRANCH" "${TARGET_BRANCH}"
+echo "WORKSPACE PATH" "${WORKSPACE_PATH}"
+echo "BAZEL PATH" "${BAZEL_PATH}"
 
 merge_instance_branch="${TARGET_BRANCH}"
 if [[ -z ${merge_instance_branch} ]]; then
