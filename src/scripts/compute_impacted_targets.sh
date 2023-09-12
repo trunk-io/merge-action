@@ -16,6 +16,8 @@ if [[ -z ${WORKSPACE_PATH} ]]; then
 	exit 2
 fi
 
+cd
+
 ifVerbose() {
 	if [[ -n ${VERBOSE} ]]; then
 		"$@"
@@ -41,7 +43,10 @@ _bazel() {
 
 # trunk-ignore(shellcheck)
 _java() {
+	old_path=$(pwd)
+	cd "${WORKSPACE_PATH}"
 	$(_bazel info java-home)/bin/java "$@"
+	cd "${old_path}"
 }
 
 bazelDiff() {
@@ -109,11 +114,11 @@ impacted_targets_out=./impacted_targets_${pr_branch_head_sha}
 
 # Generate Hashes for the Merge Instance Branch
 git switch "${MERGE_INSTANCE_BRANCH}"
-bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
+bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="." "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
 git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH}"
-bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
+bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="." "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
 
 # Compute impacted targets
 bazelDiff get-impacted-targets --startingHashes="${merge_instance_branch_out}" --finalHashes="${merge_instance_with_pr_branch_out}" --output="${impacted_targets_out}"
