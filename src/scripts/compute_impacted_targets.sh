@@ -3,8 +3,6 @@
 set -euo pipefail
 shopt -s expand_aliases
 
-git clone https://github.com/jagadesh1982/SampleTest.git
-
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
 	echo "Missing branch"
 	exit 2
@@ -59,6 +57,10 @@ fetchRemoteGitHistory() {
 	git fetch --quiet --depth=2147483647 origin "$@"
 	logIfVerbose "...done!"
 }
+
+pwd
+ls -a
+git status
 
 fetchRemoteGitHistory "${MERGE_INSTANCE_BRANCH}"
 fetchRemoteGitHistory "${PR_BRANCH}"
