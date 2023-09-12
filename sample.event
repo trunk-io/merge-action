@@ -5,15 +5,11 @@
     },
     "base": {
       "ref": "sample-base-ref"
-    }
+    },
+    "number": 123
   },
   "repository": {
     "default_branch": "main"
-  },
-  "event": {
-    "pull_request": {
-      "number": 123
-    }
   },
   "inputs": {
     "target-branch": "main2"
