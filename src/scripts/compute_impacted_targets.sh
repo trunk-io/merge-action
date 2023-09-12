@@ -6,6 +6,8 @@ shopt -s expand_aliases
 git clone https://github.com/trunk-io/merge-action.git
 ls -ar
 cd merge-action
+pwd
+ls -ar
 
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
 	echo "Missing branch"
