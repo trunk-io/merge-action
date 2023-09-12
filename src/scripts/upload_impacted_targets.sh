@@ -49,6 +49,7 @@ PR_BODY=$(
 		'{ "number": $number, "sha": $sha }'
 )
 
+num_impacted_targets=0
 POST_BODY="./post_body_tmp"
 if [[ -n ${IMPACTS_ALL} ]]; then
 	jq --null-input \
@@ -69,6 +70,7 @@ else
 	else
 		echo "${IMPACTED_TARGETS}" >"${IMPACTED_TARGETS_JSON_TMP}"
 	fi
+	num_impacted_targets=$(wc -l <"${IMPACTED_TARGETS_FILE}")
 
 	jq --null-input \
 		--argjson repo "${REPO_BODY}" \
@@ -89,7 +91,6 @@ HTTP_STATUS_CODE=$(
 EXIT_CODE=0
 COMMENT_TEXT=""
 if [[ ${HTTP_STATUS_CODE} == 200 ]]; then
-	num_impacted_targets=$(wc -l <"${IMPACTED_TARGETS_FILE}")
 	COMMENT_TEXT="✨ Uploaded ${num_impacted_targets} impacted targets for ${PR_NUMBER} @ ${PR_SHA}"
 else
 	EXIT_CODE=1

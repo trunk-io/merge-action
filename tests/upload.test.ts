@@ -40,9 +40,10 @@ const runUploadTargets = async (
   env: Environment = ENV_VARIABLES,
 ) => {
   // The bazel / glob / ... scripts are responsible for populating these files.
-  // Verify that the upload works as intended.
-  const targets = impactedTargets === "ALL" ? "ALL" : impactedTargets.join("\n");
-  fs.writeFileSync(env.IMPACTED_TARGETS_FILE as string, targets);
+  // Verify that the upload works as intended.;
+  if (impactedTargets !== "ALL") {
+    fs.writeFileSync(env.IMPACTED_TARGETS_FILE, impactedTargets.join("\n"));
+  }
 
   const runScript = util.promisify(exec.exec)(
     `${exportEnv(env)} ${UPLOAD_IMPACTED_TARGETS_SCRIPT}`,
@@ -61,8 +62,8 @@ const expectImpactedTargetsUpload = (
   expect(actualBody).toEqual({
     repo: {
       host: "github.com",
-      owner: (REPOSITORY as string).split("/")[0],
-      name: (REPOSITORY as string).split("/")[1],
+      owner: REPOSITORY.split("/")[0],
+      name: REPOSITORY.split("/")[1],
     },
     pr: {
       number: PR_NUMBER,
@@ -95,7 +96,7 @@ beforeEach(function () {
 });
 
 afterEach(function () {
-  fs.rmSync(ENV_VARIABLES.IMPACTED_TARGETS_FILE as string, { force: true });
+  fs.rmSync(ENV_VARIABLES.IMPACTED_TARGETS_FILE, { force: true });
 });
 
 afterAll(function () {
@@ -134,11 +135,14 @@ test("supports 100K targets", async function () {
   expectImpactedTargetsUpload(impactedTargets);
 });
 
-test("supports ALL without impacted targets file", async function () {
+test("supports ALL", async function () {
   const env: Environment = { ...ENV_VARIABLES, IMPACTS_ALL: "true" };
-  const impactedTargets = "ALL";
-  await runUploadTargets(impactedTargets, env);
-  expectImpactedTargetsUpload(impactedTargets, env);
+  await runUploadTargets("ALL", env);
+  expectImpactedTargetsUpload("ALL", env);
+
+  // Also passes if the IMPACTED_TARGETS_FILE is unspecified.
+  await runUploadTargets("ALL", _.omit(env, "IMPACTED_TARGETS_FILE"));
+  expectImpactedTargetsUpload("ALL", _.omit(env, "IMPACTED_TARGETS_FILE"));
 });
 
 test("rejects when missing API token", async function () {
