@@ -61,13 +61,12 @@ runs:
 
     - name: Detect impacts all
       id: detect-impacts-all
+      if: ${{ inputs.impacts-all-filters != '' }}
       shell: bash
       run: |
         impacts_all=false
-        if [[ -e ${{ steps.detect-changed-files.outputs.changes }} ]]; then
-          if echo "${{ steps.detect-change-files.outputs.changes }}" | jq length; then
-            impacts_all=true
-          fi
+        if echo "${{ steps.detect-change-files.outputs.changes }}" | jq length; then
+          impacts_all=true
         fi
         echo "impacts_all=${impacts_all}" >>"${GITHUB_OUTPUT}"
 
