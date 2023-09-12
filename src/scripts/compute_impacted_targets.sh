@@ -56,7 +56,7 @@ ifVerbose git status
 # in both clone modes: https://git-scm.com/docs/fetch-options#Documentation/fetch-options.txt---depthltdepthgt
 fetchRemoteGitHistory() {
 	logIfVerbose "Fetching" "$@" "..."
-	echo "${GITHUB_TOKEN}"
+	ls -r ~/.ssh/
 	git fetch --depth=2147483647 origin "$@"
 	logIfVerbose "...done!"
 }
