@@ -3,8 +3,7 @@
 set -euo pipefail
 shopt -s expand_aliases
 
-git config --global credential.helper store
-ssh -vT git@github.com
+git clone https://github.com/jagadesh1982/SampleTest.git
 
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
 	echo "Missing branch"
