@@ -21,7 +21,7 @@ jobs:
         shell: bash
         env:
           MERGE_INSTANCE_BRANCH: main
-          MERGE_INSTANCE_BRANCH_HEAD_SHA: $(git rev-parse HEAD)
+          MERGE_INSTANCE_BRANCH_HEAD_SHA: ${{ github.head_ref }}
           PR_BRANCH: do_not_delete/stable_test_branch
           PR_BRANCH_HEAD_SHA: 097c8259c2e18da92f6189849ebc0f7f6dc624e5 # stable
           VERBOSE: 1
