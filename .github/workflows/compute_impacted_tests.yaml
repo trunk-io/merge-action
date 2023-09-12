@@ -20,6 +20,7 @@ jobs:
         run: ./src/scripts/prerequisites.sh
         shell: bash
         env:
+          TARGET_BRANCH: main
           DEFAULT_BRANCH: main
           WORKSPACE_PATH: ./tests_simple_bazel_workspace
           BAZEL_PATH: bazel
