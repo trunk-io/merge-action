@@ -6,6 +6,8 @@ shopt -s expand_aliases
 git clone https://github.com/trunk-io/merge-action.git
 cd merge-action
 
+ls -ar
+
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
 	echo "Missing branch"
 	exit 2
@@ -15,8 +17,6 @@ if [[ -z ${WORKSPACE_PATH} ]]; then
 	echo "Missing workspace path"
 	exit 2
 fi
-
-cd
 
 ifVerbose() {
 	if [[ -n ${VERBOSE} ]]; then
