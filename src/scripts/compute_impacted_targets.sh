@@ -61,7 +61,7 @@ fetchRemoteGitHistory() {
 pwd
 ls -a
 git status
-
+git remote show origin
 fetchRemoteGitHistory "${MERGE_INSTANCE_BRANCH}"
 fetchRemoteGitHistory "${PR_BRANCH}"
 
