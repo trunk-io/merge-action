@@ -51,7 +51,7 @@ PR_BODY=$(
 
 num_impacted_targets=0
 POST_BODY="./post_body_tmp"
-if [[ -n ${IMPACTS_ALL} ]]; then
+if [[ ${IMPACTS_ALL} == 'true' ]]; then
 	jq --null-input \
 		--argjson repo "${REPO_BODY}" \
 		--argjson pr "${PR_BODY}" \

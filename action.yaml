@@ -50,8 +50,8 @@ runs:
         WORKSPACE_PATH: ${{ inputs.bazel-workspace-path }}
         BAZEL_PATH: ${{ inputs.bazel-path }}
 
-    - name: Detect impacts-all
-      id: detect-impacts-all
+    - name: Detect changed files
+      id: detect-changed-files
       if: ${{ inputs.impacts-all-path != '' }}
       # trunk-ignore(semgrep): Trust the paths-filter action.
       uses: dorny/paths-filter@v2
@@ -59,8 +59,22 @@ runs:
         base: ${{ steps.prerequisites.outputs.merge_instance_branch }}
         filters: ${{ inputs.impacts-all-path }}
 
+    - name: Detect impacts all
+      id: detect-impacts-all
+      shell: bash
+      run: |
+        impacts_all=false
+        if [[ -e ${{ steps.detect-changed-files.changes }} ]]; then
+          if echo "${{ steps.detect-change-files.changes }}" | jq length; then
+            impacts_all=true
+          fi
+        fi
+        echo "impacts_all=${impacts_all}" >>"${GITHUB_OUTPUT}"
+
     - name: Install Bazel in PATH
-      if: ${{ steps.prerequisites.outputs.requires_default_bazel_installation == 'true' }}
+      if:
+        ${{ steps.detects-impacts-all.outputs.impacts_all == 'true' }} && ${{
+        steps.prerequisites.outputs.requires_default_bazel_installation == 'true' }}
       # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
       uses: bazelbuild/setup-bazelisk@v2
 
@@ -70,7 +84,7 @@ runs:
 
     - name: Compute Impacted Targets
       id: compute-impacted-targets
-      if: $(echo ${{ steps.detects-impacts-all.outputs.changes }} | jq length) == 0
+      if: ${{ steps.detects-impacts-all.outputs.impacts_all == 'false' }}
       run: ${GITHUB_ACTION_PATH}/src/scripts/compute_impacted_targets.sh
       shell: bash
       env:
@@ -91,5 +105,5 @@ runs:
         TARGET_BRANCH: ${{ steps.prerequisites.outputs.merge_instance_branch }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
         PR_SHA: ${{ steps.compute-impacted-targets.outputs.git_commit }}
-        IMPACTS_ALL: $(echo ${{ steps.detects-impacts-all.outputs.changes }} | jq length) || ''
+        IMPACTS_ALL: ${{ steps.detects-impacts-all.outputs.impacts_all }}
         IMPACTED_TARGETS_FILE: ${{ steps.compute-impacted-targets.outputs.impacted_targets_out }}

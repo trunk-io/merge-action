@@ -20,7 +20,7 @@ const ENV_VARIABLES: Environment = {
   TARGET_BRANCH: "test-target-branch",
   PR_NUMBER: "123",
   PR_SHA: "test-pr-sha",
-  IMPACTS_ALL: "",
+  IMPACTS_ALL: "false",
   IMPACTED_TARGETS_FILE: "/tmp/test-impacted-targets-file",
   API_URL: fetchUrl("/testUploadImpactedTargets"),
 };
