@@ -10,7 +10,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Compute Impacted Targets
-        uses: trunk-io/merge-action@4562746c7db1279db02e80bbc926988e7ff1edf3
+        uses: trunk-io/merge-action@347fbe354e0d976162f65d155b69d3292d714a0f
         with:
           ### Use your repositories API token to authenticate impacted targets uploads.
           trunk-token: ${{ secrets.TRUNK_REPO_API_TOKEN }}
