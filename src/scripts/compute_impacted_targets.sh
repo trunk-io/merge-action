@@ -47,6 +47,8 @@ bazelDiff() {
 	fi
 }
 
+ifVerbose git status
+
 # NOTE: We cannot assume that the checked out Git repo (e.g. via actions-checkout)
 # was a shallow vs a complete clone. The `--depth` options deepens the commit history
 # in both clone modes: https://git-scm.com/docs/fetch-options#Documentation/fetch-options.txt---depthltdepthgt
