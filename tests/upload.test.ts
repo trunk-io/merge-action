@@ -16,7 +16,7 @@ const ENV_VARIABLES: Record<string, string> = {
   REPOSITORY: "test-repo-owner/test-repo-name",
   TARGET_BRANCH: "test-target-branch",
   PR_NUMBER: "123",
-  PR_SHA: "test-pr-sha",
+  PR_BRANCH_HEAD_SHA: "test-pr-sha",
   IMPACTED_TARGETS_FILE: "/tmp/test-impacted-targets-file",
   API_URL: fetchUrl("/testUploadImpactedTargets"),
 };
@@ -47,7 +47,7 @@ const runUploadTargets = async (
 };
 
 const expectImpactedTargetsUpload = (impactedTargets: string[]): void => {
-  const { API_TOKEN, REPOSITORY, TARGET_BRANCH, PR_NUMBER, PR_SHA } = ENV_VARIABLES;
+  const { API_TOKEN, REPOSITORY, TARGET_BRANCH, PR_NUMBER, PR_BRANCH_HEAD_SHA } = ENV_VARIABLES;
   const [actualToken, actualBody] = uploadedImpactedTargetsPayload;
   expect(actualToken).toEqual(API_TOKEN);
   expect(actualBody).toEqual({
@@ -58,7 +58,7 @@ const expectImpactedTargetsUpload = (impactedTargets: string[]): void => {
     },
     pr: {
       number: PR_NUMBER,
-      sha: PR_SHA,
+      sha: PR_BRANCH_HEAD_SHA,
     },
     targetBranch: TARGET_BRANCH,
     impactedTargets,
@@ -121,7 +121,7 @@ test("supports 1K targets", async function () {
 });
 
 test("supports 100K targets", async function () {
-  const impactedTargets = [...new Array(1_000)].map((_, i) => `target-${i}`);
+  const impactedTargets = [...new Array(100_000)].map((_, i) => `target-${i}`);
   await runUploadTargets(impactedTargets);
   expectImpactedTargetsUpload(impactedTargets);
 });

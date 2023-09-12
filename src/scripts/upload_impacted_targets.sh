@@ -17,7 +17,7 @@ fi
 REPO_OWNER=$(echo "${REPOSITORY}" | cut -d "/" -f 1)
 REPO_NAME=$(echo "${REPOSITORY}" | cut -d "/" -f 2)
 
-if [[ (-z ${PR_NUMBER}) || (-z ${PR_SHA}) ]]; then
+if [[ (-z ${PR_NUMBER}) || (-z ${PR_BRANCH_HEAD_SHA}) ]]; then
 	echo "Missing PR params"
 	exit 2
 fi
@@ -54,7 +54,7 @@ REPO_BODY=$(
 PR_BODY=$(
 	jq --null-input \
 		--arg number "${PR_NUMBER}" \
-		--arg sha "${PR_SHA}" \
+		--arg sha "${PR_BRANCH_HEAD_SHA}" \
 		'{ "number": $number, "sha": $sha }'
 )
 
@@ -78,10 +78,10 @@ EXIT_CODE=0
 COMMENT_TEXT=""
 if [[ ${HTTP_STATUS_CODE} == 200 ]]; then
 	num_impacted_targets=$(wc -l <"${IMPACTED_TARGETS_FILE}")
-	COMMENT_TEXT="✨ Uploaded ${num_impacted_targets} impacted targets for ${PR_NUMBER} @ ${PR_SHA}"
+	COMMENT_TEXT="✨ Uploaded ${num_impacted_targets} impacted targets for ${PR_NUMBER} @ ${PR_BRANCH_HEAD_SHA}"
 else
 	EXIT_CODE=1
-	COMMENT_TEXT="❌ Unable to upload impacted targets. Encountered ${HTTP_STATUS_CODE} @ ${PR_SHA}. Please contact us at slack.trunk.io."
+	COMMENT_TEXT="❌ Unable to upload impacted targets. Encountered ${HTTP_STATUS_CODE} @ ${PR_BRANCH_HEAD_SHA}. Please contact us at slack.trunk.io."
 
 	# Dependabot doesn't have access to GitHub action Secrets.
 	# On authn failure, prompt the user to update their token.
