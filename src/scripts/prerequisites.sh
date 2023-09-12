@@ -38,9 +38,10 @@ fi
 fetchRemoteGitHistory "${merge_instance_branch}"
 fetchRemoteGitHistory "${pr_branch}"
 
-echo "Fetching head shas"
-merge_instance_branch_head_sha=$(git rev-parse "${merge_instance_branch}")
-pr_branch_head_sha=$(git rev-parse "${pr_branch}")
+git rev-parse main
+
+merge_instance_branch_head_sha=$(git rev-parse ${merge_instance_branch})
+pr_branch_head_sha=$(git rev-parse ${pr_branch})
 
 # Outputs
 # trunk-ignore(shellcheck/SC2129)
