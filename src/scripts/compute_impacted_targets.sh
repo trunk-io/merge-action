@@ -96,8 +96,8 @@ if [[ -n ${VERBOSE} ]]; then
 fi
 
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
-curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
 cd "${WORKSPACE_PATH}"
+curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
 _java -jar bazel-diff.jar -V
 _bazel version # Does not require running with startup options.
 
