@@ -49,7 +49,7 @@ PR_BODY=$(
 		'{ "number": $number, "sha": $sha }'
 )
 
-num_impacted_targets=0
+num_impacted_targets="all"
 POST_BODY="./post_body_tmp"
 if [[ ${IMPACTS_ALL} == 'true' ]]; then
 	jq --null-input \

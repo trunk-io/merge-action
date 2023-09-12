@@ -52,20 +52,20 @@ runs:
 
     - name: Detect changed files
       id: detect-changed-files
-      if: ${{ inputs.impacts-all-path != '' }}
+      if: ${{ inputs.impacts-all-filters != '' }}
       # trunk-ignore(semgrep): Trust the paths-filter action.
       uses: dorny/paths-filter@v2
       with:
         base: ${{ steps.prerequisites.outputs.merge_instance_branch }}
-        filters: ${{ inputs.impacts-all-path }}
+        filters: ${{ inputs.impacts-all-filters }}
 
     - name: Detect impacts all
       id: detect-impacts-all
       shell: bash
       run: |
         impacts_all=false
-        if [[ -e ${{ steps.detect-changed-files.changes }} ]]; then
-          if echo "${{ steps.detect-change-files.changes }}" | jq length; then
+        if [[ -e ${{ steps.detect-changed-files.outputs.changes }} ]]; then
+          if echo "${{ steps.detect-change-files.outputs.changes }}" | jq length; then
             impacts_all=true
           fi
         fi
