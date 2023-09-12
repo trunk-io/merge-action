@@ -5,7 +5,6 @@ shopt -s expand_aliases
 
 git clone https://github.com/trunk-io/merge-action.git
 cd merge-action
-cd "${WORKSPACE_PATH}"
 
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
 	echo "Missing branch"
@@ -106,6 +105,7 @@ merge_instance_branch_out=./${merge_instance_branch_head_sha}
 merge_instance_with_pr_branch_out=./${pr_branch_head_sha}_${merge_instance_branch_head_sha}
 impacted_targets_out=./impacted_targets_${pr_branch_head_sha}
 
+cd "${WORKSPACE_PATH}"
 # Generate Hashes for the Merge Instance Branch
 git switch "${MERGE_INSTANCE_BRANCH}"
 bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="." "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
