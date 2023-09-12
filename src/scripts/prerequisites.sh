@@ -7,7 +7,7 @@ set -euo pipefail
 # in both clone modes: https://git-scm.com/docs/fetch-options#Documentation/fetch-options.txt---depthltdepthgt
 fetchRemoteGitHistory() {
 	echo "Fetching" "$@"
-	git fetch --quiet --depth=2147483647 origin "$@"
+	git fetch --depth=2147483647 origin "$@"
 	echo $?
 }
 
