@@ -7,20 +7,24 @@ import fs from "node:fs";
 import http from "node:http";
 import util from "node:util";
 
+type ImpactedTargets = string[] | "ALL";
+type Environment = Record<string, string>;
+
 const PORT = 4567;
 
 const fetchUrl = (path: string) => `http://localhost:${PORT}${path}`;
 const UPLOAD_IMPACTED_TARGETS_SCRIPT = "src/scripts/upload_impacted_targets.sh";
-const ENV_VARIABLES: Record<string, string> = {
+const ENV_VARIABLES: Environment = {
   API_TOKEN: "test-api-token",
   REPOSITORY: "test-repo-owner/test-repo-name",
   TARGET_BRANCH: "test-target-branch",
   PR_NUMBER: "123",
   PR_SHA: "test-pr-sha",
+  IMPACTS_ALL: "",
   IMPACTED_TARGETS_FILE: "/tmp/test-impacted-targets-file",
   API_URL: fetchUrl("/testUploadImpactedTargets"),
 };
-const exportEnv = (env: Record<string, string>) =>
+const exportEnv = (env: Environment) =>
   Object.entries(env)
     .map(([key, value]) => `${key}=${value}`)
     .join(" ");
@@ -32,12 +36,13 @@ let server: http.Server;
 let uploadedImpactedTargetsPayload = [null, null];
 
 const runUploadTargets = async (
-  impactedTargets: string[],
-  env: Record<string, string> = ENV_VARIABLES,
+  impactedTargets: ImpactedTargets,
+  env: Environment = ENV_VARIABLES,
 ) => {
   // The bazel / glob / ... scripts are responsible for populating these files.
   // Verify that the upload works as intended.
-  fs.writeFileSync(env.IMPACTED_TARGETS_FILE, impactedTargets.join("\n"));
+  const targets = impactedTargets === "ALL" ? "ALL" : impactedTargets.join("\n");
+  fs.writeFileSync(env.IMPACTED_TARGETS_FILE as string, targets);
 
   const runScript = util.promisify(exec.exec)(
     `${exportEnv(env)} ${UPLOAD_IMPACTED_TARGETS_SCRIPT}`,
@@ -46,15 +51,18 @@ const runUploadTargets = async (
   await runScript;
 };
 
-const expectImpactedTargetsUpload = (impactedTargets: string[]): void => {
-  const { API_TOKEN, REPOSITORY, TARGET_BRANCH, PR_NUMBER, PR_SHA } = ENV_VARIABLES;
+const expectImpactedTargetsUpload = (
+  impactedTargets: ImpactedTargets,
+  env: Environment = ENV_VARIABLES,
+): void => {
+  const { API_TOKEN, REPOSITORY, TARGET_BRANCH, PR_NUMBER, PR_SHA } = env;
   const [actualToken, actualBody] = uploadedImpactedTargetsPayload;
   expect(actualToken).toEqual(API_TOKEN);
   expect(actualBody).toEqual({
     repo: {
       host: "github.com",
-      owner: REPOSITORY.split("/")[0],
-      name: REPOSITORY.split("/")[1],
+      owner: (REPOSITORY as string).split("/")[0],
+      name: (REPOSITORY as string).split("/")[1],
     },
     pr: {
       number: PR_NUMBER,
@@ -87,7 +95,7 @@ beforeEach(function () {
 });
 
 afterEach(function () {
-  fs.rmSync(ENV_VARIABLES.IMPACTED_TARGETS_FILE, { force: true });
+  fs.rmSync(ENV_VARIABLES.IMPACTED_TARGETS_FILE as string, { force: true });
 });
 
 afterAll(function () {
@@ -121,9 +129,16 @@ test("supports 1K targets", async function () {
 });
 
 test("supports 100K targets", async function () {
-  const impactedTargets = [...new Array(1_000)].map((_, i) => `target-${i}`);
+  const impactedTargets = [...new Array(100_000)].map((_, i) => `target-${i}`);
   await runUploadTargets(impactedTargets);
   expectImpactedTargetsUpload(impactedTargets);
+});
+
+test("supports ALL without impacted targets file", async function () {
+  const env: Environment = { ...ENV_VARIABLES, IMPACTS_ALL: "true" };
+  const impactedTargets = "ALL";
+  await runUploadTargets(impactedTargets, env);
+  expectImpactedTargetsUpload(impactedTargets, env);
 });
 
 test("rejects when missing API token", async function () {

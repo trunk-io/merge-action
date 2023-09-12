@@ -29,6 +29,13 @@ inputs:
     description: A path to the Bazel executable. Defaults to PATH.
     required: false
     default: bazel
+  impacts-all-filters:
+    description:
+      A path to a list of filters. If any modified file is included in this list of filters, all
+      targets will be considered impacted. See
+      https://github.com/dorny/paths-filter/blob/master/.github/filters.yml for an example.
+    required: false
+    default: ""
 
 runs:
   using: composite
@@ -43,6 +50,15 @@ runs:
         WORKSPACE_PATH: ${{ inputs.bazel-workspace-path }}
         BAZEL_PATH: ${{ inputs.bazel-path }}
 
+    - name: Detect impacts-all
+      id: detect-impacts-all
+      if: ${{ inputs.impacts-all-path != '' }}
+      # trunk-ignore(semgrep): Trust the paths-filter action.
+      uses: dorny/paths-filter@v2
+      with:
+        base: ${{ steps.prerequisites.outputs.merge_instance_branch }}
+        filters: ${{ inputs.impacts-all-path }}
+
     - name: Install Bazel in PATH
       if: ${{ steps.prerequisites.outputs.requires_default_bazel_installation == 'true' }}
       # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
@@ -54,6 +70,7 @@ runs:
 
     - name: Compute Impacted Targets
       id: compute-impacted-targets
+      if: $(echo ${{ steps.detects-impacts-all.outputs.changes }} | jq length) == 0
       run: ${GITHUB_ACTION_PATH}/src/scripts/compute_impacted_targets.sh
       shell: bash
       env:
@@ -74,4 +91,5 @@ runs:
         TARGET_BRANCH: ${{ steps.prerequisites.outputs.merge_instance_branch }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
         PR_SHA: ${{ steps.compute-impacted-targets.outputs.git_commit }}
+        IMPACTS_ALL: $(echo ${{ steps.detects-impacts-all.outputs.changes }} | jq length) || ''
         IMPACTED_TARGETS_FILE: ${{ steps.compute-impacted-targets.outputs.impacted_targets_out }}
