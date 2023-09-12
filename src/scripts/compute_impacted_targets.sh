@@ -4,6 +4,7 @@ set -euo pipefail
 shopt -s expand_aliases
 
 git config --global credential.helper store
+ssh -vT git@github.com
 
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
 	echo "Missing branch"
@@ -39,7 +40,9 @@ _bazel() {
 }
 
 # trunk-ignore(shellcheck)
-alias _java=$(_bazel info java-home)/bin/java
+_java() {
+	$(_bazel info java-home)/bin/java "$@"
+}
 
 bazelDiff() {
 	if [[ -n ${VERBOSE} ]]; then
