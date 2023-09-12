@@ -8,6 +8,7 @@ set -euo pipefail
 fetchRemoteGitHistory() {
 	echo "Fetching" "$@"
 	git fetch --quiet --depth=2147483647 origin "$@"
+	echo $?
 }
 
 # trunk-ignore(shellcheck/SC2153): Passed in as env variable
@@ -37,8 +38,6 @@ fi
 
 fetchRemoteGitHistory "${merge_instance_branch}"
 fetchRemoteGitHistory "${pr_branch}"
-
-git rev-parse HEAD
 
 merge_instance_branch_head_sha=$(git rev-parse ${merge_instance_branch})
 pr_branch_head_sha=$(git rev-parse ${pr_branch})
