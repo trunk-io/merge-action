@@ -17,6 +17,10 @@ fi
 REPO_OWNER=$(echo "${REPOSITORY}" | cut -d "/" -f 1)
 REPO_NAME=$(echo "${REPOSITORY}" | cut -d "/" -f 2)
 
+echo "REPOSITORY" "${REPOSITORY}"
+echo "PR_NUMBER" "${PR_NUMBER}"
+echo "PR_SHA" "${PR_SHA}"
+
 if [[ (-z ${PR_NUMBER}) || (-z ${PR_SHA}) ]]; then
 	echo "Missing PR params"
 	exit 2
