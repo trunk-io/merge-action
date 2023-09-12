@@ -36,8 +36,10 @@ _bazel() {
 	${BAZEL_PATH} ${bazel_startup_options} "$@"
 }
 
-# trunk-ignore(shellcheck)
-alias _java=$(_bazel info java-home)/bin/java
+_java() {
+	# trunk-ignore(shellcheck)
+	$(_bazel info java-home)/bin/java "$@"
+}
 
 bazelDiff() {
 	if [[ -n ${VERBOSE} ]]; then
@@ -54,6 +56,7 @@ ifVerbose git status
 # in both clone modes: https://git-scm.com/docs/fetch-options#Documentation/fetch-options.txt---depthltdepthgt
 fetchRemoteGitHistory() {
 	logIfVerbose "Fetching" "$@" "..."
+	gh auth token
 	git fetch --depth=2147483647 origin "$@"
 	logIfVerbose "...done!"
 }
