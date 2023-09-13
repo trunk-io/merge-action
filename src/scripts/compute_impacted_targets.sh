@@ -3,6 +3,7 @@
 set -euo pipefail
 shopt -s expand_aliases
 
+git remote -v
 ssh -vvvT git@github.com
 
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
