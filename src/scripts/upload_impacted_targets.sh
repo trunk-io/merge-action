@@ -8,6 +8,7 @@ if [[ -z ${API_TOKEN+x} ]]; then
 	exit 2
 fi
 
+git remote -v
 echo "REPOSITORY" "${REPOSITORY}"
 
 # POST Body Parameters
