@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-cd merge-service-test
+cd mg-service-test
 
 merge_instance_branch="${TARGET_BRANCH}"
 if [[ -z ${merge_instance_branch} ]]; then
