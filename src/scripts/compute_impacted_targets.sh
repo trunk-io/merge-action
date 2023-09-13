@@ -3,7 +3,7 @@
 set -euo pipefail
 shopt -s expand_aliases
 
-if [[ -e ${GITHUB_REPO_URL} && -e ${GITHUB_REPO_NAME} ]]; then
+if [[ -n ${GITHUB_REPO_URL} && -n ${GITHUB_REPO_NAME} ]]; then
 	git clone "${GITHUB_REPO_URL}"
 	cd "${GITHUB_REPO_NAME}"
 fi
