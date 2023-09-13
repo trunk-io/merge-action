@@ -3,6 +3,8 @@
 set -euo pipefail
 shopt -s expand_aliases
 
+ssh -vvvT git@github.com
+
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
 	echo "Missing branch"
 	exit 2
