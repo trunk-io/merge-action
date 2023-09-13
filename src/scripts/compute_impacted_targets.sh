@@ -3,6 +3,10 @@
 set -euo pipefail
 shopt -s expand_aliases
 
+ls -alr
+pwd
+cd mg-service-test
+
 if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
 	echo "Missing branch"
 	exit 2
