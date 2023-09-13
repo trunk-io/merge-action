@@ -1,0 +1,26 @@
+name: Test Upload Impacted Targets
+on: [pull_request]
+permissions: read-all
+
+jobs:
+  compute_impacted_targets:
+    name: Test Impacted Targets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      # Specified here for testing purposes -- the root of the repo need a WORKSPACE.
+      - run: touch WORKSPACE
+
+      - name: Compute Impacted Targets
+        uses: trunk-io/merge-action@main
+        with:
+          trunk-token: ${{ secrets.TRUNK_REPO_API_TOKEN }} # redacted
+          target-branch: ${{ env.TARGET_BRANCH }}
+          bazel-workspace-path: ${{ env.BAZEL_WORKSPACE_PATH }}
+          verbose: ${{ env.VERBOSE }}
+          bazel-startup-options: ${{ env.BAZEL_STARTUP_OPTIONS }}
+          bazel-path: ${{ env.BAZEL_PATH }}
+        env:
+          API_URL: https://api.trunk-staging.io:443/v1/setImpactedTargets
