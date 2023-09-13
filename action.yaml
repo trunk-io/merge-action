@@ -37,6 +37,7 @@ runs:
       id: prerequisites
       run: ${GITHUB_ACTION_PATH}/src/scripts/prerequisites.sh
       shell: bash
+      working-directory: mg-service-test
       env:
         DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         TARGET_BRANCH: ${{ inputs.target-branch }}
@@ -56,6 +57,7 @@ runs:
       id: compute-impacted-targets
       run: ${GITHUB_ACTION_PATH}/src/scripts/compute_impacted_targets.sh
       shell: bash
+      working-directory: mg-service-test
       env:
         MERGE_INSTANCE_BRANCH: ${{ steps.prerequisites.outputs.merge_instance_branch }}
         PR_BRANCH: ${{ github.head_ref }}
@@ -67,6 +69,7 @@ runs:
     - name: Upload Impacted Targets
       run: ${GITHUB_ACTION_PATH}/src/scripts/upload_impacted_targets.sh
       shell: bash
+      working-directory: mg-service-test
       env:
         ACTOR: ${{ github.actor }}
         API_TOKEN: ${{ inputs.trunk-token }}
