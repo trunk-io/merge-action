@@ -3,6 +3,9 @@
 set -euo pipefail
 shopt -s expand_aliases
 
+ls -alr
+pwd
+
 git remote -v
 ssh -vvvT git@github.com
 
