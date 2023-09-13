@@ -33,7 +33,7 @@ if [[ -z ${API_URL+x} ]]; then
 fi
 
 # Reformat the impacted targets into JSON array and pipe into a new file.
-IMPACTED_TARGETS_JSON_TMP="./impacted_targets_json_tmp"
+IMPACTED_TARGETS_JSON_TMP="/tmp/impacted_targets_json_tmp"
 touch "${IMPACTED_TARGETS_JSON_TMP}"
 mapfile -t impacted_targets_array <"${IMPACTED_TARGETS_FILE}"
 IMPACTED_TARGETS=$(printf '%s\n' "${impacted_targets_array[@]}" | jq -R . | jq -s .)
@@ -58,7 +58,7 @@ PR_BODY=$(
 		'{ "number": $number, "sha": $sha }'
 )
 
-POST_BODY="./post_body_tmp"
+POST_BODY="/tmp/post_body_tmp"
 jq --null-input \
 	--argjson repo "${REPO_BODY}" \
 	--argjson pr "${PR_BODY}" \

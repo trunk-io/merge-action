@@ -94,9 +94,9 @@ _java -jar bazel-diff.jar -V
 _bazel version # Does not require running with startup options.
 
 # Output Files
-merge_instance_branch_out=./${merge_instance_branch_head_sha}
-merge_instance_with_pr_branch_out=./${pr_branch_head_sha}_${merge_instance_branch_head_sha}
-impacted_targets_out=./impacted_targets_${pr_branch_head_sha}
+merge_instance_branch_out=/tmp/${merge_instance_branch_head_sha}
+merge_instance_with_pr_branch_out=/tmp/${pr_branch_head_sha}_${merge_instance_branch_head_sha}
+impacted_targets_out=/tmp/impacted_targets_${pr_branch_head_sha}
 
 # Generate Hashes for the Merge Instance Branch
 git switch "${MERGE_INSTANCE_BRANCH}"
