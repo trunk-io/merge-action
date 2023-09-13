@@ -8,6 +8,8 @@ if [[ -z ${API_TOKEN+x} ]]; then
 	exit 2
 fi
 
+echo "REPOSITORY" "${REPOSITORY}"
+
 # POST Body Parameters
 if [[ (-z ${REPOSITORY}) || (-z ${TARGET_BRANCH}) ]]; then
 	echo "Missing Repo params"
