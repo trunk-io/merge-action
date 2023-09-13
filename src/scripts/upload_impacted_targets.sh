@@ -62,9 +62,9 @@ POST_BODY="./post_body_tmp"
 jq --null-input \
 	--argjson repo "${REPO_BODY}" \
 	--argjson pr "${PR_BODY}" \
-	--slurpfile impactedTargets "${IMPACTED_TARGETS_JSON_TMP}" \
+	--arg impactedTargets "ALL" \
 	--arg targetBranch "${TARGET_BRANCH}" \
-	'{ "repo": $repo, "pr": $pr, "targetBranch": $targetBranch, "impactedTargets": $impactedTargets | .[0] | map(select(length > 0)) }' \
+	'{ "repo": $repo, "pr": $pr, "targetBranch": $targetBranch, "impactedTargets": $impactedTargets }' \
 	>"${POST_BODY}"
 
 HTTP_STATUS_CODE=$(
