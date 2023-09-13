@@ -3,6 +3,9 @@
 set -euo pipefail
 
 cd mg-service-test
+pwd
+ls -ar
+git remote -v
 
 merge_instance_branch="${TARGET_BRANCH}"
 if [[ -z ${merge_instance_branch} ]]; then
