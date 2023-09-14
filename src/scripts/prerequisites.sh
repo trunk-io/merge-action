@@ -34,9 +34,11 @@ if [[ ${BAZEL_PATH} == "bazel" ]]; then
 	fi
 fi
 
+changes_count=0
 impacts_all_detected="false"
-if [[ -e ${IMPACTS_FILTERS_CHANGES} ]]; then
-	if echo "${IMPACTS_FILTERS_CHANGES}" | jq length; then
+if [[ -n ${IMPACTS_FILTERS_CHANGES+x} ]]; then
+	changes_count=$(echo "${IMPACTS_FILTERS_CHANGES}" | jq length)
+	if [[ ${changes_count} -gt 0 ]]; then
 		impacts_all_detected="true"
 	fi
 fi
