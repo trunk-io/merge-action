@@ -38,7 +38,10 @@ fi
 fetchRemoteGitHistory "${merge_instance_branch}"
 fetchRemoteGitHistory "${pr_branch}"
 
+git switch "${merge_instance_branch}"
 merge_instance_branch_head_sha=$(git rev-parse "${MERGE_INSTANCE_BRANCH}")
+
+git switch "${pr_branch}"
 pr_branch_head_sha=$(git rev-parse "${PR_BRANCH}")
 
 # Outputs
