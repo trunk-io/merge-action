@@ -54,6 +54,7 @@ runs:
       env:
         DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         TARGET_BRANCH: ${{ inputs.target-branch }}
+        PR_BRANCH: ${{ github.head_ref }}
         WORKSPACE_PATH: ${{ inputs.bazel-workspace-path }}
         BAZEL_PATH: ${{ inputs.bazel-path }}
 
@@ -72,7 +73,10 @@ runs:
       shell: bash
       env:
         MERGE_INSTANCE_BRANCH: ${{ steps.prerequisites.outputs.merge_instance_branch }}
-        PR_BRANCH: ${{ github.head_ref }}
+        MERGE_INSTANCE_BRANCH_HEAD_SHA:
+          ${{ steps.prerequisites.outputs.merge_instance_branch_head_sha }}
+        PR_BRANCH: ${{ steps.prerequisites.outputs.pr_branch }}
+        PR_BRANCH_HEAD_SHA: ${{ steps.prerequisites.outputs.pr_branch_head_sha }}
         VERBOSE: ${{ inputs.verbose }}
         WORKSPACE_PATH: ${{ steps.prerequisites.outputs.workspace_path }}
         BAZEL_PATH: ${{ inputs.bazel-path }}
@@ -87,5 +91,5 @@ runs:
         REPOSITORY: ${{ github.repository }}
         TARGET_BRANCH: ${{ steps.prerequisites.outputs.merge_instance_branch }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
-        PR_SHA: ${{ steps.compute-impacted-targets.outputs.git_commit }}
+        PR_SHA: ${{ steps.prerequisites.outputs.pr_branch_head_sha }}
         IMPACTED_TARGETS_FILE: ${{ steps.compute-impacted-targets.outputs.impacted_targets_out }}

@@ -2,6 +2,16 @@
 
 set -euo pipefail
 
+# NOTE: We cannot assume that the checked out Git repo (e.g. via actions-checkout)
+# was a shallow vs a complete clone. The `--depth` options deepens the commit history
+# in both clone modes: https://git-scm.com/docs/fetch-options#Documentation/fetch-options.txt---depthltdepthgt
+fetchRemoteGitHistory() {
+	logIfVerbose "Fetching" "$@" "..."
+	git fetch --quiet --depth=2147483647 origin "$@"
+	logIfVerbose "...done!"
+}
+
+pr_branch="${PR_BRANCH}"
 merge_instance_branch="${TARGET_BRANCH}"
 if [[ -z ${merge_instance_branch} ]]; then
 	merge_instance_branch="${DEFAULT_BRANCH}"
@@ -25,8 +35,17 @@ if [[ ${BAZEL_PATH} == "bazel" ]]; then
 	fi
 fi
 
+fetchRemoteGitHistory "${merge_instance_branch}"
+fetchRemoteGitHistory "${pr_branch}"
+
+merge_instance_branch_head_sha=$(git rev-parse "${MERGE_INSTANCE_BRANCH}")
+pr_branch_head_sha=$(git rev-parse "${PR_BRANCH}")
+
 # Outputs
 # trunk-ignore(shellcheck/SC2129)
 echo "merge_instance_branch=${merge_instance_branch}" >>"${GITHUB_OUTPUT}"
+echo "merge_instance_branch_head_sha=${merge_instance_branch_head_sha}" >>"${GITHUB_OUTPUT}"
+echo "pr_branch=${pr_branch}" >>"${GITHUB_OUTPUT}"
+echo "pr_branch_head_sha=${pr_branch_head_sha}" >>"${GITHUB_OUTPUT}"
 echo "workspace_path=${workspace_path}" >>"${GITHUB_OUTPUT}"
 echo "requires_default_bazel_installation=${requires_default_bazel_installation}" >>"${GITHUB_OUTPUT}"
