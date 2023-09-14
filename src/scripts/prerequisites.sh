@@ -9,7 +9,7 @@ ls -alr
 # was a shallow vs a complete clone. The `--depth` options deepens the commit history
 # in both clone modes: https://git-scm.com/docs/fetch-options#Documentation/fetch-options.txt---depthltdepthgt
 fetchRemoteGitHistory() {
-	echos "Fetching" "$@" "..."
+	echo "Fetching" "$@" "..."
 	git fetch --depth=2147483647 origin "$@"
 	echo "...done!"
 }
