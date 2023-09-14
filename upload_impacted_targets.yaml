@@ -12,7 +12,7 @@ jobs:
       - run: touch WORKSPACE
 
       - name: Compute Impacted Targets
-        uses: trunk-io/merge-action@67a32552116622d06cca42275403cd18d9852e2b
+        uses: trunk-io/merge-action@7c18ac456e31790ea74d3a07a2475c8dcc92d92b
         with:
           ### Use your repositories API token to authenticate impacted targets uploads.
           trunk-token: ${{ secrets.TRUNK_REPO_API_TOKEN }}
