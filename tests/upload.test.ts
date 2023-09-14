@@ -9,6 +9,8 @@ import util from "node:util";
 
 const PORT = 4567;
 
+type ImpactedTargets = string[] | "ALL";
+
 const fetchUrl = (path: string) => `http://localhost:${PORT}${path}`;
 const UPLOAD_IMPACTED_TARGETS_SCRIPT = "src/scripts/upload_impacted_targets.sh";
 const ENV_VARIABLES: Record<string, string> = {
@@ -18,6 +20,7 @@ const ENV_VARIABLES: Record<string, string> = {
   PR_NUMBER: "123",
   PR_SHA: "test-pr-sha",
   IMPACTED_TARGETS_FILE: "/tmp/test-impacted-targets-file",
+  IMPACTS_ALL_DETECTED: "false",
   API_URL: fetchUrl("/testUploadImpactedTargets"),
 };
 const exportEnv = (env: Record<string, string>) =>
@@ -32,12 +35,14 @@ let server: http.Server;
 let uploadedImpactedTargetsPayload = [null, null];
 
 const runUploadTargets = async (
-  impactedTargets: string[],
+  impactedTargets: ImpactedTargets,
   env: Record<string, string> = ENV_VARIABLES,
 ) => {
   // The bazel / glob / ... scripts are responsible for populating these files.
   // Verify that the upload works as intended.
-  fs.writeFileSync(env.IMPACTED_TARGETS_FILE, impactedTargets.join("\n"));
+  if (impactedTargets !== "ALL") {
+    fs.writeFileSync(env.IMPACTED_TARGETS_FILE, impactedTargets.join("\n"));
+  }
 
   const runScript = util.promisify(exec.exec)(
     `${exportEnv(env)} ${UPLOAD_IMPACTED_TARGETS_SCRIPT}`,
@@ -46,7 +51,7 @@ const runUploadTargets = async (
   await runScript;
 };
 
-const expectImpactedTargetsUpload = (impactedTargets: string[]): void => {
+const expectImpactedTargetsUpload = (impactedTargets: ImpactedTargets): void => {
   const { API_TOKEN, REPOSITORY, TARGET_BRANCH, PR_NUMBER, PR_SHA } = ENV_VARIABLES;
   const [actualToken, actualBody] = uploadedImpactedTargetsPayload;
   expect(actualToken).toEqual(API_TOKEN);
@@ -121,9 +126,15 @@ test("supports 1K targets", async function () {
 });
 
 test("supports 100K targets", async function () {
-  const impactedTargets = [...new Array(1_000)].map((_, i) => `target-${i}`);
+  const impactedTargets = [...new Array(100_000)].map((_, i) => `target-${i}`);
   await runUploadTargets(impactedTargets);
   expectImpactedTargetsUpload(impactedTargets);
+});
+
+test("supports IMPACTS_ALL", async function () {
+  const env = { ...ENV_VARIABLES, IMPACTS_ALL_DETECTED: "true" };
+  await runUploadTargets("ALL", env);
+  expectImpactedTargetsUpload("ALL");
 });
 
 test("rejects when missing API token", async function () {

@@ -57,19 +57,24 @@ runs:
         PR_BRANCH: ${{ github.head_ref }}
         WORKSPACE_PATH: ${{ inputs.bazel-workspace-path }}
         BAZEL_PATH: ${{ inputs.bazel-path }}
+        IMPACTS_FILTERS_CHANGES: ${{ steps.detect-changed-paths.outputs.changes }}
 
     - name: Install Bazel in PATH
-      if: ${{ steps.prerequisites.outputs.requires_default_bazel_installation == 'true' }}
+      if:
+        ${{ steps.prerequisites.outputs.requires_default_bazel_installation == 'true' }} && ${{
+        steps.prerequisites.outputs.impacts_all_detected == 'false' }}
       # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
       uses: bazelbuild/setup-bazelisk@v2
 
     - name: Setup jq
+      if: ${{ steps.prerequisites.outputs.impacts_all_detected == 'false' }}
       # trunk-ignore(semgrep): Trust third-party action to install JQ. Source code: https://github.com/dcarbone/install-jq-action/
       uses: dcarbone/install-jq-action@v1.0.1
 
     - name: Compute Impacted Targets
       id: compute-impacted-targets
       run: ${GITHUB_ACTION_PATH}/src/scripts/compute_impacted_targets.sh
+      if: ${{ steps.prerequisites.outputs.impacts_all_detected == 'false' }}
       shell: bash
       env:
         MERGE_INSTANCE_BRANCH: ${{ steps.prerequisites.outputs.merge_instance_branch }}
@@ -93,3 +98,4 @@ runs:
         PR_NUMBER: ${{ github.event.pull_request.number }}
         PR_SHA: ${{ steps.prerequisites.outputs.pr_branch_head_sha }}
         IMPACTED_TARGETS_FILE: ${{ steps.compute-impacted-targets.outputs.impacted_targets_out }}
+        IMPACTS_ALL_DETECTED: ${{ steps.prerequisites.outputs.impacts_all_detected }}

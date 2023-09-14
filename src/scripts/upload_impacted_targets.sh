@@ -22,25 +22,9 @@ if [[ (-z ${PR_NUMBER}) || (-z ${PR_SHA}) ]]; then
 	exit 2
 fi
 
-if [[ -z ${IMPACTED_TARGETS_FILE+x} ]]; then
-	echo "Missing Impacted Targets File"
-	exit 2
-fi
-
 # API URL
 if [[ -z ${API_URL+x} ]]; then
 	API_URL="https://api.trunk.io:443/v1/setImpactedTargets"
-fi
-
-# Reformat the impacted targets into JSON array and pipe into a new file.
-IMPACTED_TARGETS_JSON_TMP="./impacted_targets_json_tmp"
-touch "${IMPACTED_TARGETS_JSON_TMP}"
-mapfile -t impacted_targets_array <"${IMPACTED_TARGETS_FILE}"
-IMPACTED_TARGETS=$(printf '%s\n' "${impacted_targets_array[@]}" | jq -R . | jq -s .)
-if [[ -z ${IMPACTED_TARGETS} ]]; then
-	echo "[]" >"${IMPACTED_TARGETS_JSON_TMP}"
-else
-	echo "${IMPACTED_TARGETS}" >"${IMPACTED_TARGETS_JSON_TMP}"
 fi
 
 REPO_BODY=$(
@@ -58,14 +42,40 @@ PR_BODY=$(
 		'{ "number": $number, "sha": $sha }'
 )
 
+num_impacted_targets=""
 POST_BODY="./post_body_tmp"
-jq --null-input \
-	--argjson repo "${REPO_BODY}" \
-	--argjson pr "${PR_BODY}" \
-	--slurpfile impactedTargets "${IMPACTED_TARGETS_JSON_TMP}" \
-	--arg targetBranch "${TARGET_BRANCH}" \
-	'{ "repo": $repo, "pr": $pr, "targetBranch": $targetBranch, "impactedTargets": $impactedTargets | .[0] | map(select(length > 0)) }' \
-	>"${POST_BODY}"
+if [[ ${IMPACTS_ALL_DETECTED} == 'true' ]]; then
+	jq --null-input \
+		--argjson repo "${REPO_BODY}" \
+		--argjson pr "${PR_BODY}" \
+		--arg impactedTargets "ALL" \
+		--arg targetBranch "${TARGET_BRANCH}" \
+		'{ "repo": $repo, "pr": $pr, "targetBranch": $targetBranch, "impactedTargets": $impactedTargets }' \
+		>"${POST_BODY}"
+
+	num_impacted_targets="'ALL'"
+else
+	# Reformat the impacted targets into JSON array and pipe into a new file.
+	IMPACTED_TARGETS_JSON_TMP="./impacted_targets_json_tmp"
+	touch "${IMPACTED_TARGETS_JSON_TMP}"
+	mapfile -t impacted_targets_array <"${IMPACTED_TARGETS_FILE}"
+	IMPACTED_TARGETS=$(printf '%s\n' "${impacted_targets_array[@]}" | jq -R . | jq -s .)
+	if [[ -z ${IMPACTED_TARGETS} ]]; then
+		echo "[]" >"${IMPACTED_TARGETS_JSON_TMP}"
+	else
+		echo "${IMPACTED_TARGETS}" >"${IMPACTED_TARGETS_JSON_TMP}"
+	fi
+
+	jq --null-input \
+		--argjson repo "${REPO_BODY}" \
+		--argjson pr "${PR_BODY}" \
+		--slurpfile impactedTargets "${IMPACTED_TARGETS_JSON_TMP}" \
+		--arg targetBranch "${TARGET_BRANCH}" \
+		'{ "repo": $repo, "pr": $pr, "targetBranch": $targetBranch, "impactedTargets": $impactedTargets | .[0] | map(select(length > 0)) }' \
+		>"${POST_BODY}"
+
+	num_impacted_targets=$(wc -l <"${IMPACTED_TARGETS_FILE}")
+fi
 
 HTTP_STATUS_CODE=$(
 	curl -s -o /dev/null -w '%{http_code}' -X POST \
@@ -77,7 +87,6 @@ HTTP_STATUS_CODE=$(
 EXIT_CODE=0
 COMMENT_TEXT=""
 if [[ ${HTTP_STATUS_CODE} == 200 ]]; then
-	num_impacted_targets=$(wc -l <"${IMPACTED_TARGETS_FILE}")
 	COMMENT_TEXT="✨ Uploaded ${num_impacted_targets} impacted targets for ${PR_NUMBER} @ ${PR_SHA}"
 else
 	EXIT_CODE=1

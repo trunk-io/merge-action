@@ -9,6 +9,7 @@ fetchRemoteGitHistory() {
 	git fetch --quiet --depth=2147483647 origin "$@"
 }
 
+# trunk-ignore(shellcheck)
 pr_branch="${PR_BRANCH}"
 merge_instance_branch="${TARGET_BRANCH}"
 if [[ -z ${merge_instance_branch} ]]; then
@@ -33,6 +34,13 @@ if [[ ${BAZEL_PATH} == "bazel" ]]; then
 	fi
 fi
 
+impacts_all_detected="false"
+if [[ -e ${IMPACTS_FILTERS_CHANGES} ]]; then
+	if echo "${IMPACTS_FILTERS_CHANGES}" | jq length; then
+		impacts_all_detected="true"
+	fi
+fi
+
 fetchRemoteGitHistory "${merge_instance_branch}"
 fetchRemoteGitHistory "${pr_branch}"
 
@@ -48,5 +56,6 @@ echo "merge_instance_branch=${merge_instance_branch}" >>"${GITHUB_OUTPUT}"
 echo "merge_instance_branch_head_sha=${merge_instance_branch_head_sha}" >>"${GITHUB_OUTPUT}"
 echo "pr_branch=${pr_branch}" >>"${GITHUB_OUTPUT}"
 echo "pr_branch_head_sha=${pr_branch_head_sha}" >>"${GITHUB_OUTPUT}"
+echo "impacts_all_detected=${impacts_all_detected}" >>"${GITHUB_OUTPUT}"
 echo "workspace_path=${workspace_path}" >>"${GITHUB_OUTPUT}"
 echo "requires_default_bazel_installation=${requires_default_bazel_installation}" >>"${GITHUB_OUTPUT}"
