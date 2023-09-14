@@ -29,10 +29,24 @@ inputs:
     description: A path to the Bazel executable. Defaults to PATH.
     required: false
     default: bazel
+  impact-all-filters-path:
+    description:
+      A path to a list of filters to identify whether `ALL` impacted targets should be considered.
+      See https://github.com/dorny/paths-filter/blob/master/.github/filters.yml for an example.
+    required: false
+    default: ""
 
 runs:
   using: composite
   steps:
+    - name: Detect changed paths
+      id: detect-changed-paths
+      if: ${{ inputs.impact-all-filters-path != '' }}
+      # trunk-ignore(semgrep/yaml.github-actions.security.third-party-action-not-pinned-to-commit-sha.third-party-action-not-pinned-to-commit-sha)
+      uses: dorny/paths-filter@v2
+      with:
+        filters: ${{ inputs.impact-all-filters-path }}
+
     - name: Prerequisites
       id: prerequisites
       run: ${GITHUB_ACTION_PATH}/src/scripts/prerequisites.sh
