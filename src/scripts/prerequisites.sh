@@ -50,6 +50,8 @@ merge_instance_branch_head_sha=$(git rev-parse "${merge_instance_branch}")
 git switch "${pr_branch}"
 pr_branch_head_sha=$(git rev-parse "${pr_branch}")
 
+echo "Identified changes: " "${impacts_all_detected}"
+
 # Outputs
 # trunk-ignore(shellcheck/SC2129)
 echo "merge_instance_branch=${merge_instance_branch}" >>"${GITHUB_OUTPUT}"
