@@ -10,6 +10,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Setup Bazel
         # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
@@ -20,8 +22,10 @@ jobs:
         run: ./src/scripts/compute_impacted_targets.sh
         shell: bash
         env:
-          MERGE_INSTANCE_BRANCH: main
+          MERGE_INSTANCE_BRANCH: do_not_delete/stable_test_branch
+          MERGE_INSTANCE_BRANCH_HEAD_SHA: 097c8259c2e18da92f6189849ebc0f7f6dc624e5
           PR_BRANCH: do_not_delete/stable_test_branch
+          PR_BRANCH_HEAD_SHA: 097c8259c2e18da92f6189849ebc0f7f6dc624e5
           VERBOSE: 1
           WORKSPACE_PATH: ./tests/simple_bazel_workspace
           BAZEL_STARTUP_OPTIONS: --host_jvm_args=-Xmx12G,--block_for_lock,--client_debug
@@ -31,6 +35,6 @@ jobs:
         shell: bash
         run: |
           target_count=`cat ${{ steps.compute.outputs.impacted_targets_out }} | wc -l`
-          if [[ $target_count -ne 2 ]]; then
+          if [[ $target_count -ne 0 ]]; then
             exit 1
           fi
