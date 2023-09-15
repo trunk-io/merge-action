@@ -59,17 +59,14 @@ runs:
         BAZEL_PATH: ${{ inputs.bazel-path }}
         IMPACTS_FILTERS_CHANGES: ${{ steps.detect-changed-paths.outputs.changes }}
 
-    - name: Install Bazel in PATH
-      if:
-        ${{ steps.prerequisites.outputs.requires_default_bazel_installation == 'true' }} && ${{
-        steps.prerequisites.outputs.impacts_all_detected == 'false' }}
-      # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
-      uses: bazelbuild/setup-bazelisk@v2
-
     - name: Setup jq
-      if: ${{ steps.prerequisites.outputs.impacts_all_detected == 'false' }}
       # trunk-ignore(semgrep): Trust third-party action to install JQ. Source code: https://github.com/dcarbone/install-jq-action/
       uses: dcarbone/install-jq-action@v1.0.1
+
+    - name: Install Bazel in PATH
+      if: ${{ steps.prerequisites.outputs.requires_default_bazel_installation == 'true' }}
+      # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
+      uses: bazelbuild/setup-bazelisk@v2
 
     - name: Compute Impacted Targets
       id: compute-impacted-targets

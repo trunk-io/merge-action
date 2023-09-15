@@ -40,6 +40,7 @@ if [[ -n ${IMPACTS_FILTERS_CHANGES+x} ]]; then
 	changes_count=$(echo "${IMPACTS_FILTERS_CHANGES}" | jq length)
 	if [[ ${changes_count} -gt 0 ]]; then
 		impacts_all_detected="true"
+		requires_default_bazel_installation="false"
 	fi
 fi
 
