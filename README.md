@@ -36,8 +36,8 @@ jobs:
       - name: Compute Impacted Targets
         uses: trunk-io/merge-action@v1
         with:
-          ### Use your repositories API token to authenticate impacted targets uploads.
-          trunk-token: ${{ secrets.TRUNK_REPO_API_TOKEN }}
+          ### Use your organizations API token to authenticate impacted targets uploads.
+          trunk-token: ${{ secrets.TRUNK_API_TOKEN }}
 ```
 
 <!-- end usage -->
