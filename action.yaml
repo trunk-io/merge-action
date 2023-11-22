@@ -34,7 +34,8 @@ inputs:
     description:
       A path to a list of filters to identify whether `ALL` impacted targets should be considered.
       See https://github.com/dorny/paths-filter/blob/master/.github/filters.yml for an example. If a
-      PR changes any of these paths, then *any* PRs queued after this one will depend on it.
+      PR changes files in any of these paths, then *any* PRs queued after this one will depend on
+      it.
     required: false
     default: ""
 

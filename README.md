@@ -39,9 +39,9 @@ argument for the action. This is useful for if a PR contains a change that any P
 future should also depend on - an example would be PRs that introduce or change workflows run on
 every PR.
 
-Getting this list of impacted targets for your PR is required before it can be queued when running
+Sending this list of impacted targets for your PR is required before it can be queued when running
 in "Parallel" mode. If you [queue your PR](LINK) before the action uploads the list, the PR will
-wait until it is before being queued.
+wait until the list has been uploaded before being queued.
 
 ## Usage
 
@@ -97,7 +97,7 @@ share an impacted target must be tested together; otherwise, they can be tested 
 
 ## Under the hood
 
-Below is more information about how this action works for specific build systems for the interested.
+Below is more information about how this action works for specific build systems.
 
 ### Bazel
 
