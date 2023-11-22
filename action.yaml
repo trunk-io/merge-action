@@ -4,12 +4,13 @@ description: Trunk.io Github Action to Compute and Upload Impacted Targets
 
 inputs:
   trunk-token:
-    description: Repo API token used for authentication. Can be found at app.trunk.io.
+    description:
+      Repo or Organization API token used for authentication. Can be found at app.trunk.io.
     required: true
   target-branch:
     description:
-      The Merge Instance's target branch. If unspecified, defaults to the repository's default
-      branch.
+      The branch that the Merge Queue merges PRs into. If unspecified, defaults to the repository's
+      default branch.
     required: false
   bazel-workspace-path:
     description:
@@ -32,7 +33,8 @@ inputs:
   impact-all-filters-path:
     description:
       A path to a list of filters to identify whether `ALL` impacted targets should be considered.
-      See https://github.com/dorny/paths-filter/blob/master/.github/filters.yml for an example.
+      See https://github.com/dorny/paths-filter/blob/master/.github/filters.yml for an example. If a
+      PR changes any of these paths, then *any* PRs queued after this one will depend on it.
     required: false
     default: ""
 
