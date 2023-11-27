@@ -1,13 +1,16 @@
 # merge-action
 
-Hosts the code for the [Trunk Merge](https://docs.trunk.io/merge) GitHub Action, which makes it easy
-to upload the required impacted targets for PRs when running your merge queues in
-["Parallel" mode](INSERT_LINK_HERE). Currently, this action supports the following build systems:
+Hosts the code for the [Trunk Merge](https://docs.trunk.io/merge-graph) GitHub Action, which makes
+it easy to upload the required impacted targets for PRs when running your merge queues in
+["Parallel" mode](https://docs.trunk.io/merge-graph/configuration#single-parallel-mode). Currently,
+this action supports the following build systems:
 
 - [Bazel](https://bazel.build/)
 
 More supported build systems are coming soon! If your build system is not supported by this action
-yet, you can still [upload impacted targets to Trunk Merge](INSERT_DOC_LINK) yourself.
+yet, you can still
+[upload impacted targets to Trunk Merge](https://docs.trunk.io/merge-graph/impacted-targets)
+yourself.
 
 ## Overview
 
@@ -18,12 +21,13 @@ requests that affect different parts of your codebase instead of testing them al
 means no more waiting for your backend changes to test before landing your doc changes!
 
 Running in "Parallel" mode requires providing Trunk Merge with the list of
-[impacted targets](LINK_HERE) resulting from the changes in your PR. If using a supported build
-system, this action can take care of getting that list and sending it to Trunk Merge.
+[impacted targets](https://docs.trunk.io/merge-graph/impacted-targets) resulting from the changes in
+your PR. If using a supported build system, this action can take care of getting that list and
+sending it to Trunk Merge.
 
 If you do not already have one for your repo, a Trunk Merge Queue can be created at
 [app.trunk.io](https://app.trunk.io). Documentation on how to do that can be found
-[here](https://docs.trunk.io/merge).
+[here](https://docs.trunk.io/merge-graph/set-up-trunk-merge).
 
 ### How This Action Works
 
@@ -40,13 +44,14 @@ future should also depend on - an example would be PRs that introduce or change 
 every PR.
 
 Sending this list of impacted targets for your PR is required before it can be queued when running
-in "Parallel" mode. If you [queue your PR](LINK) before the action uploads the list, the PR will
-wait until the list has been uploaded before being queued.
+in "Parallel" mode. If you [queue your PR](https://docs.trunk.io/merge-graph/testing-pull-requests)
+before the action uploads the list, the PR will wait until the list has been uploaded before being
+queued.
 
 ## Usage
 
 Running this action in a GitHub workflow will require you knowing your Trunk Repo or Trunk Org API
-token. For instructions on how to get that, see [here](LINK).
+token.
 
 ### Example
 
