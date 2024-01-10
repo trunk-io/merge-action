@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+set -x
+
 # API Token
 if [[ -z ${API_TOKEN+x} ]]; then
 	echo "Missing API Token"
