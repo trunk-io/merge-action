@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+set -x
 
 # NOTE: We cannot assume that the checked out Git repo (e.g. via actions-checkout)
 # was a shallow vs a complete clone. The `--depth` options deepens the commit history
