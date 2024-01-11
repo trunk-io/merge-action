@@ -11,7 +11,7 @@ fetchRemoteGitHistory() {
 }
 
 # trunk-ignore(shellcheck)
-pr_branch="${PR_BRANCH}"
+pr_branch="refs/remotes/pull/${PR_BRANCH}"
 merge_instance_branch="${TARGET_BRANCH}"
 if [[ -z ${merge_instance_branch} ]]; then
 	merge_instance_branch="${DEFAULT_BRANCH}"
@@ -50,7 +50,7 @@ fetchRemoteGitHistory "${pr_branch}"
 
 merge_instance_branch_head_sha=$(git rev-parse "origin/${merge_instance_branch}")
 
-pr_branch_head_sha=$(git rev-parse "origin/${pr_branch}")
+pr_branch_head_sha=$(git rev-parse "${pr_branch}")
 
 echo "Identified changes: " "${impacts_all_detected}"
 
