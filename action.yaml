@@ -48,9 +48,12 @@ inputs:
 #      - pro: easy change
 #      - con: has security implications
 #
-#   2- use pull_request to workflow_dispatch something?
+#   2- use pull_request to workflow_run something?
 #      - pro: better security? because gated on approver re-run
 #      - con: setup is now more involved
+#      - nb: this is what we did for Trunk Check, see https://github.com/trunk-io/trunk-action/pull/27
+#        also- https://github.com/trunk-io/trunk-action?tab=readme-ov-file#getting-inline-annotations-for-fork-prs
+#        
 runs:
   using: composite
   steps:
