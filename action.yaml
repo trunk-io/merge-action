@@ -57,7 +57,8 @@ runs:
     - name: Set env vars
       shell: bash
       run: |
-        echo "API_TOKEN=$INPUT_TRUNK_TOKEN" >>$GITHUB_ENV
+        env | sort
+        echo "API_TOKEN=$INPUT_TRUNK-TOKEN" >>$GITHUB_ENV
 
     - name: Prerequisites
       id: prerequisites
