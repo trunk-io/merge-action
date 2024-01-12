@@ -13,7 +13,7 @@ fetchRemoteGitHistory() {
 any_error_occurred=false
 
 if [[ -z ${API_TOKEN} ]]; then
-	echo "You must specify a 'trunk-token' for trunk-io/merge-action to use"
+	echo "❌ You must specify a 'trunk-token' for trunk-io/merge-action to use"
 	any_error_occurred=true
 fi
 
@@ -25,7 +25,7 @@ if [[ -z ${merge_instance_branch} ]]; then
 fi
 
 if [[ -z ${merge_instance_branch} ]]; then
-	echo "Could not identify merge instance branch"
+	echo "❌ Could not identify the branch that Trunk Merge will merge this change into"
 	any_error_occurred=true
 fi
 
