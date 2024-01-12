@@ -43,8 +43,6 @@ inputs:
 #How the author is associated with the repository.
 #Can be one of: COLLABORATOR, CONTRIBUTOR, FIRST_TIMER, FIRST_TIME_CONTRIBUTOR, MANNEQUIN, MEMBER, NONE, OWNER
 
-env:
-  API_TOKEN: ${{ inputs.trunk-token }}
 runs:
   using: composite
   steps:
@@ -55,6 +53,11 @@ runs:
       uses: dorny/paths-filter@v2
       with:
         filters: ${{ inputs.impact-all-filters-path }}
+
+    - name: Set env vars
+      shell: bash
+      run: |
+        echo "API_TOKEN=$INPUT_TRUNK_TOKEN" >>$GITHUB_ENV
 
     - name: Prerequisites
       id: prerequisites
