@@ -11,7 +11,7 @@ fetchRemoteGitHistory() {
 }
 
 # trunk-ignore(shellcheck)
-pr_branch="pull/${PR_BRANCH}"
+pr_branch="${PR_BRANCH}"
 merge_instance_branch="${TARGET_BRANCH}"
 if [[ -z ${merge_instance_branch} ]]; then
 	merge_instance_branch="${DEFAULT_BRANCH}"
