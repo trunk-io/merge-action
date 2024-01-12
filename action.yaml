@@ -67,6 +67,9 @@ runs:
       run: ${GITHUB_ACTION_PATH}/src/scripts/prerequisites.sh
       shell: bash
       env:
+        TRIGGERING_EVENT: ${{ github.event_name }}
+        BASE_REPO: ${{ github.event.pull_request.base.repo.full_name }}
+        HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
         DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         TARGET_BRANCH: ${{ inputs.target-branch }}
         PR_BRANCH: ${{ github.event.pull_request.head.sha }}

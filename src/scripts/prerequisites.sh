@@ -13,7 +13,13 @@ fetchRemoteGitHistory() {
 any_error_occurred=false
 
 if [[ -z ${API_TOKEN} ]]; then
-	echo "❌ You must specify a 'trunk-token' for trunk-io/merge-action to use"
+	if [[ "${BASE_REPO}" != "${HEAD_REPO}" -a "${TRIGGERING_EVENT}" = "pull_request"]]; then
+		echo "❌ This action is running in a fork, but does not have access to 'trunk-token'"
+		echo "  You need to change this workflow to trigger on 'pull_request_target' events"
+		echo "  instead of triggering on 'pull_request' events"
+	else
+		echo "❌ You must specify a 'trunk-token' for trunk-io/merge-action to use"
+	fi
 	any_error_occurred=true
 fi
 
