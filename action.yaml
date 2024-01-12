@@ -43,6 +43,14 @@ inputs:
 #How the author is associated with the repository.
 #Can be one of: COLLABORATOR, CONTRIBUTOR, FIRST_TIMER, FIRST_TIME_CONTRIBUTOR, MANNEQUIN, MEMBER, NONE, OWNER
 
+# Implementation options:
+#   1- use pull_request_target instead of pull_request to trigger this action
+#      - pro: easy change
+#      - con: has security implications
+#
+#   2- use pull_request to workflow_dispatch something?
+#      - pro: better security? because gated on approver re-run
+#      - con: setup is now more involved
 runs:
   using: composite
   steps:
