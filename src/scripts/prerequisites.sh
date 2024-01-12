@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+set -x
 
 # NOTE: We cannot assume that the checked out Git repo (e.g. via actions-checkout)
 # was a shallow vs a complete clone. The `--depth` options deepens the commit history
@@ -8,6 +9,19 @@ set -euo pipefail
 fetchRemoteGitHistory() {
 	git fetch --quiet --depth=2147483647 origin "$@"
 }
+
+any_error_occurred=false
+
+if [[ -z ${API_TOKEN} ]]; then
+	if [[ ("${BASE_REPO}" != "${HEAD_REPO}") && ("${TRIGGERING_EVENT}" != "pull_request_target") ]]; then
+		echo "❌ This action is running in a fork, but does not have access to 'trunk-token'"
+		echo "    You need to change this workflow to trigger on 'pull_request_target' events"
+		echo "    instead of triggering on 'pull_request' events"
+	else
+		echo "❌ You must specify a 'trunk-token' for trunk-io/merge-action to use"
+	fi
+	any_error_occurred=true
+fi
 
 # trunk-ignore(shellcheck)
 pr_branch="${PR_BRANCH}"
@@ -17,8 +31,8 @@ if [[ -z ${merge_instance_branch} ]]; then
 fi
 
 if [[ -z ${merge_instance_branch} ]]; then
-	echo "Could not identify merge instance branch"
-	exit 2
+	echo "❌ Could not identify the branch that Trunk Merge will merge this change into"
+	any_error_occurred=true
 fi
 
 # trunk-ignore(shellcheck/SC2153): Passed in as env variable
@@ -47,10 +61,7 @@ fi
 fetchRemoteGitHistory "${merge_instance_branch}"
 fetchRemoteGitHistory "${pr_branch}"
 
-git switch "${merge_instance_branch}"
-merge_instance_branch_head_sha=$(git rev-parse "${merge_instance_branch}")
-
-git switch "${pr_branch}"
+merge_instance_branch_head_sha=$(git rev-parse "origin/${merge_instance_branch}")
 pr_branch_head_sha=$(git rev-parse "${pr_branch}")
 
 echo "Identified changes: " "${impacts_all_detected}"
@@ -64,3 +75,7 @@ echo "pr_branch_head_sha=${pr_branch_head_sha}" >>"${GITHUB_OUTPUT}"
 echo "impacts_all_detected=${impacts_all_detected}" >>"${GITHUB_OUTPUT}"
 echo "workspace_path=${workspace_path}" >>"${GITHUB_OUTPUT}"
 echo "requires_default_bazel_installation=${requires_default_bazel_installation}" >>"${GITHUB_OUTPUT}"
+
+if [[ "${any_error_occurred}" = true ]]; then
+  exit 2
+fi

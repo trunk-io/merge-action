@@ -39,6 +39,21 @@ inputs:
     required: false
     default: ""
 
+# author_association string Required
+#How the author is associated with the repository.
+#Can be one of: COLLABORATOR, CONTRIBUTOR, FIRST_TIMER, FIRST_TIME_CONTRIBUTOR, MANNEQUIN, MEMBER, NONE, OWNER
+
+# Implementation options:
+#   1- use pull_request_target instead of pull_request to trigger this action
+#      - pro: easy change
+#      - con: has security implications
+#
+#   2- use pull_request to workflow_run something?
+#      - pro: better security? because gated on approver re-run
+#      - con: setup is now more involved
+#      - nb: this is what we did for Trunk Check, see https://github.com/trunk-io/trunk-action/pull/27
+#        also- https://github.com/trunk-io/trunk-action?tab=readme-ov-file#getting-inline-annotations-for-fork-prs
+#        
 runs:
   using: composite
   steps:
@@ -50,14 +65,25 @@ runs:
       with:
         filters: ${{ inputs.impact-all-filters-path }}
 
+    - name: Set env vars
+      shell: bash
+      run: |
+        env | sort
+        echo "API_TOKEN=${API_TOKEN}" >>$GITHUB_ENV
+      env:
+        API_TOKEN: ${{ inputs.trunk-token }}
+
     - name: Prerequisites
       id: prerequisites
       run: ${GITHUB_ACTION_PATH}/src/scripts/prerequisites.sh
       shell: bash
       env:
+        TRIGGERING_EVENT: ${{ github.event_name }}
+        BASE_REPO: ${{ github.event.pull_request.base.repo.full_name }}
+        HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
         DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         TARGET_BRANCH: ${{ inputs.target-branch }}
-        PR_BRANCH: ${{ github.head_ref }}
+        PR_BRANCH: ${{ github.event.pull_request.head.sha }}
         WORKSPACE_PATH: ${{ inputs.bazel-workspace-path }}
         BAZEL_PATH: ${{ inputs.bazel-path }}
         IMPACTS_FILTERS_CHANGES: ${{ steps.detect-changed-paths.outputs.changes }}
@@ -92,7 +118,6 @@ runs:
       shell: bash
       env:
         ACTOR: ${{ github.actor }}
-        API_TOKEN: ${{ inputs.trunk-token }}
         REPOSITORY: ${{ github.repository }}
         TARGET_BRANCH: ${{ steps.prerequisites.outputs.merge_instance_branch }}
         PR_NUMBER: ${{ github.event.pull_request.number }}

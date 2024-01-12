@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+set -x
+
 # API Token
 if [[ -z ${API_TOKEN+x} ]]; then
 	echo "Missing API Token"
@@ -76,6 +78,8 @@ else
 
 	num_impacted_targets=$(wc -l <"${IMPACTED_TARGETS_FILE}")
 fi
+
+cat $POST_BODY
 
 HTTP_STATUS_CODE=$(
 	curl -s -o /dev/null -w '%{http_code}' -X POST \
