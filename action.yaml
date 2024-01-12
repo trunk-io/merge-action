@@ -39,10 +39,10 @@ inputs:
     required: false
     default: ""
 
+env:
+  API_TOKEN: ${{ inputs.trunk-token }}
 runs:
   using: composite
-  env:
-    API_TOKEN: ${{ inputs.trunk-token }}
   steps:
     - name: Detect changed paths
       id: detect-changed-paths
