@@ -10,6 +10,13 @@ fetchRemoteGitHistory() {
 	git fetch --quiet --depth=2147483647 origin "$@"
 }
 
+any_error_occurred=false
+
+if [[ -z ${API_TOKEN} ]]; then
+	echo "You must specify a `trunk-token` for trunk-io/merge-action to use"
+	any_error_occurred=true
+fi
+
 # trunk-ignore(shellcheck)
 pr_branch="${PR_BRANCH}"
 merge_instance_branch="${TARGET_BRANCH}"
@@ -19,7 +26,7 @@ fi
 
 if [[ -z ${merge_instance_branch} ]]; then
 	echo "Could not identify merge instance branch"
-	exit 2
+	any_error_occurred=true
 fi
 
 # trunk-ignore(shellcheck/SC2153): Passed in as env variable
@@ -62,3 +69,7 @@ echo "pr_branch_head_sha=${pr_branch_head_sha}" >>"${GITHUB_OUTPUT}"
 echo "impacts_all_detected=${impacts_all_detected}" >>"${GITHUB_OUTPUT}"
 echo "workspace_path=${workspace_path}" >>"${GITHUB_OUTPUT}"
 echo "requires_default_bazel_installation=${requires_default_bazel_installation}" >>"${GITHUB_OUTPUT}"
+
+if [[ "${any_error_occurred}" = true ]]; then
+  exit 2
+fi

@@ -41,6 +41,8 @@ inputs:
 
 runs:
   using: composite
+  env:
+    API_TOKEN: ${{ inputs.trunk-token }}
   steps:
     - name: Detect changed paths
       id: detect-changed-paths
@@ -92,7 +94,6 @@ runs:
       shell: bash
       env:
         ACTOR: ${{ github.actor }}
-        API_TOKEN: ${{ inputs.trunk-token }}
         REPOSITORY: ${{ github.repository }}
         TARGET_BRANCH: ${{ steps.prerequisites.outputs.merge_instance_branch }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
