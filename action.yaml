@@ -58,7 +58,7 @@ runs:
       shell: bash
       run: |
         env | sort
-        echo "API_TOKEN=$API_TOKEN" >>$GITHUB_ENV
+        echo "API_TOKEN=${API_TOKEN}" >>$GITHUB_ENV
       env:
         API_TOKEN: ${{ inputs.trunk-token }}
 
