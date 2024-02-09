@@ -79,7 +79,7 @@ fi
 
 HTTP_STATUS_CODE=$(
 	curl -s -o /dev/null -w '%{http_code}' -X POST \
-		-H "Content-Type: application/json" -H "x-api-token:${API_TOKEN}" \
+		-H "Content-Type: application/json" -H "x-api-token:${API_TOKEN}" -H "x-forked-workflow-run-id:${RUN_ID}" \
 		-d "@${POST_BODY}" \
 		"${API_URL}"
 )

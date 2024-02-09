@@ -94,6 +94,7 @@ runs:
         ACTOR: ${{ github.actor }}
         API_TOKEN: ${{ inputs.trunk-token }}
         REPOSITORY: ${{ github.repository }}
+        RUN_ID: ${{ github.run_id }}
         TARGET_BRANCH: ${{ steps.prerequisites.outputs.merge_instance_branch }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
         PR_SHA: ${{ steps.prerequisites.outputs.pr_branch_head_sha }}
