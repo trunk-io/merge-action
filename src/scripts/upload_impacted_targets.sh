@@ -2,12 +2,14 @@
 
 set -euo pipefail
 
+IS_FORK_BOOL="${IS_FORK:=false}"
+
 # API Token is required if PR is not from a fork, or
 # RUN ID is required if PR is from a fork
-if [[ (-z ${API_TOKEN-}) && (${IS_FORK} == 'false') ]]; then
+if [[ (-z ${API_TOKEN-}) && (${IS_FORK_BOOL} == 'false') ]]; then
 	echo "Missing API Token when PR is not from a fork"
 	exit 2
-elif [[ (-z ${RUN_ID-}) && (${IS_FORK} == 'true') ]]; then
+elif [[ (-z ${RUN_ID-}) && (${IS_FORK_BOOL} == 'true') ]]; then
 	echo "Missing workflow run id when PR is from a fork"
 	exit 2
 fi

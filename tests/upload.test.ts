@@ -182,7 +182,11 @@ describe("upload_impacted_targets", () => {
     await expect(runUploadTargets(["a"], { API_TOKEN: "" })).rejects.toBeTruthy();
   });
 
-  it("rejects when missing forked workflow ID and is not a fork", async function () {
+  it("rejects when missing API token and fork env vars", async function () {
+    await expect(runUploadTargets(["a"], { API_TOKEN: "", IS_FORK: "" })).rejects.toBeTruthy();
+  });
+
+  it("rejects when missing forked workflow ID and is a fork", async function () {
     await expect(
       runUploadTargets(["a"], { API_TOKEN: "", RUN_ID: "", IS_FORK: "true" }),
     ).rejects.toBeTruthy();
