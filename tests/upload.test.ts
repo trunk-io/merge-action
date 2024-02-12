@@ -168,8 +168,7 @@ describe("upload_impacted_targets", () => {
   });
 
   it("supports IMPACTS_ALL", async function () {
-    const env = { ...DEFAULT_ENV_VARIABLES, IMPACTS_ALL_DETECTED: "true" };
-    await runUploadTargets("ALL", env);
+    await runUploadTargets("ALL", { IMPACTS_ALL_DETECTED: "true" });
     expectImpactedTargetsUpload("ALL");
   });
 
@@ -181,6 +180,12 @@ describe("upload_impacted_targets", () => {
 
   it("rejects when missing API token and is not a fork", async function () {
     await expect(runUploadTargets(["a"], { API_TOKEN: "" })).rejects.toBeTruthy();
+  });
+
+  it("rejects when missing forked workflow ID and is not a fork", async function () {
+    await expect(
+      runUploadTargets(["a"], { API_TOKEN: "", RUN_ID: "", IS_FORK: "true" }),
+    ).rejects.toBeTruthy();
   });
 
   it("rejects on http 401", async function () {

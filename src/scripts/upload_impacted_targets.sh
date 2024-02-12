@@ -12,10 +12,6 @@ elif [[ (-z ${RUN_ID-}) && (${IS_FORK} == 'true') ]]; then
 	exit 2
 fi
 
-echo "1"
-echo "${API_TOKEN+x}"
-echo "2"
-
 # POST Body Parameters
 if [[ (-z ${REPOSITORY}) || (-z ${TARGET_BRANCH}) ]]; then
 	echo "Missing Repo params"
