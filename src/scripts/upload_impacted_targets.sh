@@ -2,9 +2,15 @@
 
 set -euo pipefail
 
-# API Token
-if [[ -z ${API_TOKEN+x} ]]; then
-	echo "Missing API Token"
+IS_FORK_BOOL="${IS_FORK:=false}"
+
+# API Token is required if PR is not from a fork, or
+# RUN ID is required if PR is from a fork
+if [[ (-z ${API_TOKEN-}) && (${IS_FORK_BOOL} == 'false') ]]; then
+	echo "Missing API Token when PR is not from a fork"
+	exit 2
+elif [[ (-z ${RUN_ID-}) && (${IS_FORK_BOOL} == 'true') ]]; then
+	echo "Missing workflow run id when PR is from a fork"
 	exit 2
 fi
 
@@ -79,7 +85,7 @@ fi
 
 HTTP_STATUS_CODE=$(
 	curl -s -o /dev/null -w '%{http_code}' -X POST \
-		-H "Content-Type: application/json" -H "x-api-token:${API_TOKEN}" \
+		-H "Content-Type: application/json" -H "x-api-token:${API_TOKEN-}" -H "x-forked-workflow-run-id:${RUN_ID-}" \
 		-d "@${POST_BODY}" \
 		"${API_URL}"
 )

@@ -6,7 +6,7 @@ inputs:
   trunk-token:
     description:
       Repo or Organization API token used for authentication. Can be found at app.trunk.io.
-    required: true
+    required: false # Required for any workflow not coming from a forked PR.
   target-branch:
     description:
       The branch that the Merge Queue merges PRs into. If unspecified, defaults to the repository's
@@ -94,6 +94,8 @@ runs:
         ACTOR: ${{ github.actor }}
         API_TOKEN: ${{ inputs.trunk-token }}
         REPOSITORY: ${{ github.repository }}
+        RUN_ID: ${{ github.run_id }}
+        IS_FORK: ${{ github.event.pull_request.head.repo.fork }}
         TARGET_BRANCH: ${{ steps.prerequisites.outputs.merge_instance_branch }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
         PR_SHA: ${{ steps.prerequisites.outputs.pr_branch_head_sha }}
