@@ -47,10 +47,7 @@ fi
 fetchRemoteGitHistory "${merge_instance_branch}"
 fetchRemoteGitHistory "${pr_head_sha}"
 
-git switch "${merge_instance_branch}"
-merge_instance_branch_head_sha=$(git rev-parse "${merge_instance_branch}")
-
-git switch "${pr_head_sha}"
+merge_instance_branch_head_sha=$(git rev-parse "origin/${merge_instance_branch}")
 
 echo "Identified changes: " "${impacts_all_detected}"
 
