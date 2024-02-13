@@ -3,8 +3,8 @@
 set -euo pipefail
 shopt -s expand_aliases
 
-if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
-	echo "Missing branch"
+if [[ -z ${MERGE_INSTANCE_BRANCH} ]]; then
+	echo "Missing merge instance branch"
 	exit 2
 fi
 
@@ -78,7 +78,7 @@ if [[ -n ${VERBOSE} ]]; then
 	pr_depth=$(git rev-list "${merge_base_sha}".."${PR_BRANCH_HEAD_SHA}" | wc -l)
 	echo "PR Depth= ${pr_depth}"
 
-	git switch "${PR_BRANCH}"
+	git switch "${PR_BRANCH_HEAD_SHA}"
 	git log -n "${pr_depth}" --oneline
 fi
 
@@ -97,7 +97,7 @@ git switch "${MERGE_INSTANCE_BRANCH}"
 bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
-git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH}"
+git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH_HEAD_SHA}"
 bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
 
 # Compute impacted targets
