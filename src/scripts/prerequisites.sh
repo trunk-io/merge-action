@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-set -x
 
 # NOTE: We cannot assume that the checked out Git repo (e.g. via actions-checkout)
 # was a shallow vs a complete clone. The `--depth` options deepens the commit history
@@ -10,8 +9,7 @@ fetchRemoteGitHistory() {
 	git fetch --quiet --depth=2147483647 origin "$@"
 }
 
-# trunk-ignore(shellcheck)
-pr_branch="${PR_BRANCH}"
+pr_head_sha="${PR_BRANCH_HEAD_SHA}"
 merge_instance_branch="${TARGET_BRANCH}"
 if [[ -z ${merge_instance_branch} ]]; then
 	merge_instance_branch="${DEFAULT_BRANCH}"
@@ -46,10 +44,13 @@ if [[ -n ${IMPACTS_FILTERS_CHANGES+x} ]]; then
 fi
 
 fetchRemoteGitHistory "${merge_instance_branch}"
-fetchRemoteGitHistory "${pr_branch}"
+fetchRemoteGitHistory "${pr_head_sha}"
 
 merge_instance_branch_head_sha=$(git rev-parse "origin/${merge_instance_branch}")
-pr_branch_head_sha=$(git rev-parse "${pr_branch}")
+if [[ -z ${merge_instance_branch_head_sha} ]]; then
+	echo "Could not identify merge instance branch head sha"
+	exit 2
+fi
 
 echo "Identified changes: " "${impacts_all_detected}"
 
@@ -57,8 +58,6 @@ echo "Identified changes: " "${impacts_all_detected}"
 # trunk-ignore(shellcheck/SC2129)
 echo "merge_instance_branch=${merge_instance_branch}" >>"${GITHUB_OUTPUT}"
 echo "merge_instance_branch_head_sha=${merge_instance_branch_head_sha}" >>"${GITHUB_OUTPUT}"
-echo "pr_branch=${pr_branch}" >>"${GITHUB_OUTPUT}"
-echo "pr_branch_head_sha=${pr_branch_head_sha}" >>"${GITHUB_OUTPUT}"
 echo "impacts_all_detected=${impacts_all_detected}" >>"${GITHUB_OUTPUT}"
 echo "workspace_path=${workspace_path}" >>"${GITHUB_OUTPUT}"
 echo "requires_default_bazel_installation=${requires_default_bazel_installation}" >>"${GITHUB_OUTPUT}"
