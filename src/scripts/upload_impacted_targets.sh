@@ -87,7 +87,7 @@ RESPONSE_BODY_FILE="./response.txt"
 
 HTTP_STATUS_CODE=$(
 	curl -v -s -o "${RESPONSE_BODY_FILE}" -w '%{http_code}' -X POST \
-		-H "Content-Type: application/json" -H "x-api-token:${API_TOKEN-}" -H "x-forked-workflow-run-id:${RUN_ID-}" \
+		-H "Content-Type: application/json" -H "x-api-token:${API_TOKEN-}" -H "x-forked-worfklow-run-id:${RUN_ID-}" \
 		-d "@${POST_BODY}" \
 		"${API_URL}"
 )
@@ -115,7 +115,8 @@ fi
 echo "${COMMENT_TEXT}"
 
 if [[ ${HTTP_STATUS_CODE} != 200 ]]; then
-	echo "Response Message - " | cat "${RESPONSE_BODY_FILE}"
+	echo "Response Body:"
+	cat "${RESPONSE_BODY_FILE}"
 fi
 
 exit "${EXIT_CODE}"
