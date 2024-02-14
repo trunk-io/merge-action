@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+set -x
 
 # NOTE: We cannot assume that the checked out Git repo (e.g. via actions-checkout)
 # was a shallow vs a complete clone. The `--depth` options deepens the commit history
@@ -47,10 +48,7 @@ fi
 fetchRemoteGitHistory "${merge_instance_branch}"
 fetchRemoteGitHistory "${pr_branch}"
 
-git switch "${merge_instance_branch}"
-merge_instance_branch_head_sha=$(git rev-parse "${merge_instance_branch}")
-
-git switch "${pr_branch}"
+merge_instance_branch_head_sha=$(git rev-parse "origin/${merge_instance_branch}")
 pr_branch_head_sha=$(git rev-parse "${pr_branch}")
 
 echo "Identified changes: " "${impacts_all_detected}"
