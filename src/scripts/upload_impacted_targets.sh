@@ -83,8 +83,10 @@ else
 	num_impacted_targets=$(wc -l <"${IMPACTED_TARGETS_FILE}")
 fi
 
+RESPONSE_BODY_FILE="./response.txt"
+
 HTTP_STATUS_CODE=$(
-	curl -s -o /dev/null -w '%{http_code}' -X POST \
+	curl -s -o "${RESPONSE_BODY_FILE}" -w '%{http_code}' -X POST \
 		-H "Content-Type: application/json" -H "x-api-token:${API_TOKEN-}" -H "x-forked-workflow-run-id:${RUN_ID-}" \
 		-d "@${POST_BODY}" \
 		"${API_URL}"
@@ -111,4 +113,10 @@ else
 fi
 
 echo "${COMMENT_TEXT}"
+
+if [[ ${HTTP_STATUS_CODE} != 200 ]]; then
+	echo "Response Body:"
+	cat "${RESPONSE_BODY_FILE}"
+fi
+
 exit "${EXIT_CODE}"
