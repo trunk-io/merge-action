@@ -3,7 +3,7 @@
 set -euo pipefail
 shopt -s expand_aliases
 
-if [[ (-z ${MERGE_INSTANCE_BRANCH}) || (-z ${PR_BRANCH}) ]]; then
+if [[ -z ${MERGE_INSTANCE_BRANCH} ]]; then
 	echo "Missing branch"
 	exit 2
 fi
@@ -52,15 +52,6 @@ bazelDiff() {
 	fi
 }
 
-# NOTE: We cannot assume that the checked out Git repo (e.g. via actions-checkout)
-# was a shallow vs a complete clone. The `--depth` options deepens the commit history
-# in both clone modes: https://git-scm.com/docs/fetch-options#Documentation/fetch-options.txt---depthltdepthgt
-fetchRemoteGitHistory() {
-	logIfVerbose "Fetching" "$@" "..."
-	git fetch --quiet --depth=2147483647 origin "$@"
-	logIfVerbose "...done!"
-}
-
 ## Verbose logging for the Merge Instance and PR branch.
 if [[ -n ${VERBOSE} ]]; then
 	# Find the merge base of the two branches
@@ -71,14 +62,14 @@ if [[ -n ${VERBOSE} ]]; then
 	merge_instance_depth=$(git rev-list "${merge_base_sha}".."${MERGE_INSTANCE_BRANCH_HEAD_SHA}" | wc -l)
 	echo "Merge Instance Depth= ${merge_instance_depth}"
 
-	git switch "${MERGE_INSTANCE_BRANCH}"
+	git checkout "${MERGE_INSTANCE_BRANCH}"
 	git log -n "${merge_instance_depth}" --oneline
 
 	# Find the number of commits between the merge base and the PR's HEAD
 	pr_depth=$(git rev-list "${merge_base_sha}".."${PR_BRANCH_HEAD_SHA}" | wc -l)
 	echo "PR Depth= ${pr_depth}"
 
-	git switch "${PR_BRANCH}"
+	git checkout "${PR_BRANCH_HEAD_SHA}"
 	git log -n "${pr_depth}" --oneline
 fi
 
@@ -97,7 +88,7 @@ git switch "${MERGE_INSTANCE_BRANCH}"
 bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
-git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH}"
+git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH_HEAD_SHA}"
 bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
 
 # Compute impacted targets

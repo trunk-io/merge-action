@@ -10,6 +10,7 @@ import { describe, beforeEach, beforeAll, afterAll, it, expect, afterEach } from
 import { strict as assert } from "node:assert";
 
 const PORT = 4567;
+const RESPONSE_FILE = "./response.txt";
 
 type ImpactedTargets = string[] | "ALL";
 
@@ -18,7 +19,7 @@ type EnvVar =
   | "REPOSITORY"
   | "TARGET_BRANCH"
   | "PR_NUMBER"
-  | "PR_SHA"
+  | "PR_BRANCH_HEAD_SHA"
   | "IMPACTED_TARGETS_FILE"
   | "IMPACTS_ALL_DETECTED"
   | "API_URL"
@@ -34,7 +35,7 @@ const DEFAULT_ENV_VARIABLES: EnvVarSet = {
   REPOSITORY: "test-repo-owner/test-repo-name",
   TARGET_BRANCH: "test-target-branch",
   PR_NUMBER: "123",
-  PR_SHA: "test-pr-sha",
+  PR_BRANCH_HEAD_SHA: "test-pr-sha",
   IMPACTED_TARGETS_FILE: "/tmp/test-impacted-targets-file",
   IMPACTS_ALL_DETECTED: "false",
   API_URL: fetchUrl("/testUploadImpactedTargets"),
@@ -81,7 +82,8 @@ describe("upload_impacted_targets", () => {
     assert(exportedEnvVars);
     assert(uploadedImpactedTargetsPayload);
 
-    const { API_TOKEN, REPOSITORY, TARGET_BRANCH, PR_NUMBER, PR_SHA, RUN_ID } = exportedEnvVars;
+    const { API_TOKEN, REPOSITORY, TARGET_BRANCH, PR_NUMBER, PR_BRANCH_HEAD_SHA, RUN_ID } =
+      exportedEnvVars;
     const { apiTokenHeader, forkedWorkflowIdHeader, requestBody } = uploadedImpactedTargetsPayload;
 
     expect(apiTokenHeader).toEqual(API_TOKEN);
@@ -94,7 +96,7 @@ describe("upload_impacted_targets", () => {
       },
       pr: {
         number: PR_NUMBER,
-        sha: PR_SHA,
+        sha: PR_BRANCH_HEAD_SHA,
       },
       targetBranch: TARGET_BRANCH,
       impactedTargets,
@@ -131,6 +133,7 @@ describe("upload_impacted_targets", () => {
 
   afterEach(function () {
     fs.rmSync(DEFAULT_ENV_VARIABLES.IMPACTED_TARGETS_FILE, { force: true });
+    fs.rmSync(RESPONSE_FILE, { force: true });
   });
 
   afterAll(function () {
