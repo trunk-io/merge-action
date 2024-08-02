@@ -63,6 +63,8 @@ if [[ -n ${VERBOSE} ]]; then
 	echo "Merge Instance Depth= ${merge_instance_depth}"
 
 	git checkout "${MERGE_INSTANCE_BRANCH}"
+	git clean -dfx -f --exclude=".trunk" .
+	git submodule update --recursive
 	git log -n "${merge_instance_depth}" --oneline
 
 	# Find the number of commits between the merge base and the PR's HEAD
@@ -70,6 +72,8 @@ if [[ -n ${VERBOSE} ]]; then
 	echo "PR Depth= ${pr_depth}"
 
 	git checkout "${PR_BRANCH_HEAD_SHA}"
+	git clean -dfx -f --exclude=".trunk" .
+	git submodule update --recursive
 	git log -n "${pr_depth}" --oneline
 fi
 
@@ -85,10 +89,14 @@ impacted_targets_out=./impacted_targets_${PR_BRANCH_HEAD_SHA}
 
 # Generate Hashes for the Merge Instance Branch
 git switch "${MERGE_INSTANCE_BRANCH}"
+git clean -dfx -f --exclude=".trunk" --exclude="bazel-diff.jar" .
+git submodule update --recursive
 bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
 git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH_HEAD_SHA}"
+git clean -dfx -f --exclude=".trunk" --exclude="${MERGE_INSTANCE_BRANCH_HEAD_SHA}" --exclude="bazel-diff.jar" .
+git submodule update --recursive
 bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
 
 # Compute impacted targets
