@@ -89,6 +89,8 @@ impacted_targets_out=./impacted_targets_${PR_BRANCH_HEAD_SHA}
 
 # Generate Hashes for the Merge Instance Branch
 git switch "${MERGE_INSTANCE_BRANCH}"
+git clean -dfx -f --exclude=".trunk" --exclude="${merge_instance_branch_out}" --exclude="${merge_instance_with_pr_branch_out}" --exclude="${impacted_targets_out}" --exclude="bazel-diff.jar" .
+git submodule update --recursive
 bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
