@@ -62,14 +62,14 @@ if [[ -n ${VERBOSE} ]]; then
 	merge_instance_depth=$(git rev-list "${merge_base_sha}".."${MERGE_INSTANCE_BRANCH_HEAD_SHA}" | wc -l)
 	echo "Merge Instance Depth= ${merge_instance_depth}"
 
-	git checkout "${MERGE_INSTANCE_BRANCH}"
+	git checkout "${MERGE_INSTANCE_BRANCH}" --recurse-submodules
 	git log -n "${merge_instance_depth}" --oneline
 
 	# Find the number of commits between the merge base and the PR's HEAD
 	pr_depth=$(git rev-list "${merge_base_sha}".."${PR_BRANCH_HEAD_SHA}" | wc -l)
 	echo "PR Depth= ${pr_depth}"
 
-	git checkout "${PR_BRANCH_HEAD_SHA}"
+	git checkout "${PR_BRANCH_HEAD_SHA}" --recurse-submodules
 	git log -n "${pr_depth}" --oneline
 fi
 
