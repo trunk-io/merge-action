@@ -95,6 +95,8 @@ bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPA
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
 git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH_HEAD_SHA}"
+git clean -dfx -f --exclude=".trunk" --exclude="${merge_instance_branch_out}" --exclude="${merge_instance_with_pr_branch_out}" --exclude="${impacted_targets_out}" --exclude="bazel-diff.jar" .
+git submodule update --recursive
 bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
 
 # Compute impacted targets
