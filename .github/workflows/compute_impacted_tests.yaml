@@ -15,7 +15,7 @@ jobs:
 
       - name: Setup Bazel
         # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
-        uses: bazelbuild/setup-bazelisk@v2
+        uses: bazel-contrib/setup-bazel@0.15.0
 
       - name: Compute Impacted Targets
         id: compute
