@@ -38,7 +38,7 @@ logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
 # If specified, parse the bazel-diff generate-hashes extra arguments.
 bazel_diff_extra_args=""
-if [[ -n ${BAZEL_DIFF_GENERATE_HASHES_EXTRA_ARGS} ]]; then
+if [[ -n ${BAZEL_DIFF_GENERATE_HASHES_EXTRA_ARGS-} ]]; then
 	bazel_diff_extra_args="${BAZEL_DIFF_GENERATE_HASHES_EXTRA_ARGS}"
 fi
 logIfVerbose "Bazel-diff generate-hashes extra args" "${bazel_diff_extra_args}"
