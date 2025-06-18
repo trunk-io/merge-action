@@ -36,6 +36,13 @@ if [[ -n ${BAZEL_STARTUP_OPTIONS} ]]; then
 fi
 logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
+# If specified, parse the bazel-diff generate-hashes extra arguments.
+bazel_diff_extra_args=""
+if [[ -n ${BAZEL_DIFF_GENERATE_HASHES_EXTRA_ARGS} ]]; then
+	bazel_diff_extra_args="${BAZEL_DIFF_GENERATE_HASHES_EXTRA_ARGS}"
+fi
+logIfVerbose "Bazel-diff generate-hashes extra args" "${bazel_diff_extra_args}"
+
 _bazel() {
 	# trunk-ignore(shellcheck)
 	${BAZEL_PATH} ${bazel_startup_options} "$@"
@@ -91,13 +98,13 @@ impacted_targets_out=./impacted_targets_${PR_BRANCH_HEAD_SHA}
 git switch "${MERGE_INSTANCE_BRANCH}"
 git clean -dfx -f --exclude=".trunk" --exclude="bazel-diff.jar" .
 git submodule update --recursive
-bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
+bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${bazel_diff_extra_args}" "${merge_instance_branch_out}"
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
 git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH_HEAD_SHA}"
 git clean -dfx -f --exclude=".trunk" --exclude="${MERGE_INSTANCE_BRANCH_HEAD_SHA}" --exclude="bazel-diff.jar" .
 git submodule update --recursive
-bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
+bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${bazel_diff_extra_args}" "${merge_instance_with_pr_branch_out}"
 
 # Compute impacted targets
 bazelDiff get-impacted-targets --startingHashes="${merge_instance_branch_out}" --finalHashes="${merge_instance_with_pr_branch_out}" --output="${impacted_targets_out}"

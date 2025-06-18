@@ -82,6 +82,23 @@ jobs:
 
 <!-- end usage -->
 
+### Advanced Configuration
+
+For more advanced Bazel configurations, you can pass additional arguments to the
+`bazel-diff generate-hashes` command:
+
+```yaml
+- name: Compute Impacted Targets
+  uses: trunk-io/merge-action@v1
+  with:
+    trunk-token: ${{ secrets.TRUNK_API_TOKEN }}
+    bazel-diff-generate-hashes-extra-args:
+      "--queryArg=--define=some_flag=true --queryArg=--define=another_flag=false"
+```
+
+This allows you to pass custom query arguments or other options that `bazel-diff` supports for the
+`generate-hashes` command.
+
 For more information on each possible argument you can provide, see
 [action.yaml](https://github.com/trunk-io/merge-action/blob/main/action.yaml).
 
