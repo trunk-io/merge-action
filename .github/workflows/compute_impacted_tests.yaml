@@ -35,6 +35,13 @@ jobs:
         shell: bash
         run: |
           target_count=`cat ${{ steps.compute.outputs.impacted_targets_out }} | wc -l`
+          echo "Number of impacted targets: $target_count"
+          echo "Impacted targets list:"
+          if [[ -s ${{ steps.compute.outputs.impacted_targets_out }} ]]; then
+            cat ${{ steps.compute.outputs.impacted_targets_out }}
+          else
+            echo "(empty)"
+          fi
           if [[ $target_count -ne 0 ]]; then
             exit 1
           fi
