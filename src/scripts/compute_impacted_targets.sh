@@ -99,8 +99,10 @@ git switch "${MERGE_INSTANCE_BRANCH}"
 git clean -dfx -f --exclude=".trunk" --exclude="bazel-diff.jar" .
 git submodule update --recursive
 if [[ -n ${bazel_diff_extra_args} ]]; then
-	bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${bazel_diff_extra_args}" "${merge_instance_branch_out}"
+	echo "Running: bazelDiff generate-hashes --bazelPath=\"${BAZEL_PATH}\" --workspacePath=\"${WORKSPACE_PATH}\" \"-so=${bazel_startup_options}\" "${bazel_diff_extra_args}" \"${merge_instance_branch_out}\""
+	bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" ${bazel_diff_extra_args} "${merge_instance_branch_out}"
 else
+	echo "Running: bazelDiff generate-hashes --bazelPath=\"${BAZEL_PATH}\" --workspacePath=\"${WORKSPACE_PATH}\" \"-so=${bazel_startup_options}\" \"${merge_instance_branch_out}\""
 	bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
 fi
 
@@ -109,8 +111,10 @@ git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash
 git clean -dfx -f --exclude=".trunk" --exclude="${MERGE_INSTANCE_BRANCH_HEAD_SHA}" --exclude="bazel-diff.jar" .
 git submodule update --recursive
 if [[ -n ${bazel_diff_extra_args} ]]; then
+	echo "Running: bazelDiff generate-hashes --bazelPath=\"${BAZEL_PATH}\" --workspacePath=\"${WORKSPACE_PATH}\" \"-so=${bazel_startup_options}\" ${bazel_diff_extra_args} \"${merge_instance_with_pr_branch_out}\""
 	bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${bazel_diff_extra_args}" "${merge_instance_with_pr_branch_out}"
 else
+	echo "Running: bazelDiff generate-hashes --bazelPath=\"${BAZEL_PATH}\" --workspacePath=\"${WORKSPACE_PATH}\" \"-so=${bazel_startup_options}\" \"${merge_instance_with_pr_branch_out}\""
 	bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
 fi
 
