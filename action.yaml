@@ -26,6 +26,12 @@ inputs:
       https://bazel.build/reference/command-line-reference#startup-options for a complete list. If
       unspecified, no startup options are specified.
     required: false
+  bazel-diff-generate-hashes-extra-args:
+    description:
+      Additional arguments to pass to the bazel-diff generate-hashes command. These arguments will
+      be appended to the generate-hashes command for both the merge instance branch and the merged
+      state. If unspecified, no extra arguments are passed.
+    required: false
   bazel-path:
     description: A path to the Bazel executable. Defaults to PATH.
     required: false
@@ -85,6 +91,7 @@ runs:
         WORKSPACE_PATH: ${{ steps.prerequisites.outputs.workspace_path }}
         BAZEL_PATH: ${{ inputs.bazel-path }}
         BAZEL_STARTUP_OPTIONS: ${{ inputs.bazel-startup-options }}
+        BAZEL_DIFF_GENERATE_HASHES_EXTRA_ARGS: ${{ inputs.bazel-diff-generate-hashes-extra-args }}
 
     - name: Upload Impacted Targets
       run: ${GITHUB_ACTION_PATH}/src/scripts/upload_impacted_targets.sh
