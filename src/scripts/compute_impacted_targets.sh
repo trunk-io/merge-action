@@ -18,6 +18,20 @@ if [[ -z ${WORKSPACE_PATH} ]]; then
 	exit 2
 fi
 
+# Default BAZEL_PATH so it can be resolved.
+if [[ -z ${BAZEL_PATH-} ]]; then
+	BAZEL_PATH=bazel
+fi
+
+# Resolve WORKSPACE_PATH to absolute so Bazel and bazel-diff run from the workspace.
+WORKSPACE_PATH=$(cd "${WORKSPACE_PATH}" && pwd)
+
+# Resolve BAZEL_PATH to absolute so bazel-diff can find the binary when it runs from the workspace dir.
+if [[ ${BAZEL_PATH} != /* ]]; then
+	resolved=$(command -v "${BAZEL_PATH}" || true)
+	[[ -n ${resolved} ]] && BAZEL_PATH=${resolved}
+fi
+
 ifVerbose() {
 	if [[ -n ${VERBOSE} ]]; then
 		"$@"
@@ -37,8 +51,9 @@ fi
 logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
 _bazel() {
+	# Run Bazel from the workspace so MODULE.bazel / .bazelversion are found.
 	# trunk-ignore(shellcheck)
-	${BAZEL_PATH} ${bazel_startup_options} "$@"
+	(cd "${WORKSPACE_PATH}" && "${BAZEL_PATH}" ${bazel_startup_options} "$@")
 }
 
 # trunk-ignore(shellcheck)
