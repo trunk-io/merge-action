@@ -45,7 +45,10 @@ cleanup_bazel_version() { rm -f "${BAZEL_VERSION_FILE}"; }
 trap cleanup_bazel_version EXIT
 [[ -f "${WORKSPACE_PATH}/.bazelversion" ]] && cp "${WORKSPACE_PATH}/.bazelversion" "${BAZEL_VERSION_FILE}"
 restore_bazel_workspace_config() {
-	[[ -f ${BAZEL_VERSION_FILE} ]] && cp "${BAZEL_VERSION_FILE}" "${WORKSPACE_PATH}/.bazelversion"
+	if [[ -f ${BAZEL_VERSION_FILE} ]]; then
+		mkdir -p "${WORKSPACE_PATH}"
+		cp "${BAZEL_VERSION_FILE}" "${WORKSPACE_PATH}/.bazelversion"
+	fi
 }
 
 ifVerbose() {
