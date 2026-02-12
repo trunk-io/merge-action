@@ -38,17 +38,14 @@ if [[ ${BAZEL_PATH} != /* ]]; then
 	fi
 fi
 
-# Save workspace Bazel config so we can restore it after git switch/clean (branches may not have it).
-BAZEL_WORKSPACE_CONFIG_DIR=$(mktemp -d)
-cleanup_bazel_config() { rm -rf "${BAZEL_WORKSPACE_CONFIG_DIR}"; }
-trap cleanup_bazel_config EXIT
-for f in .bazelversion MODULE.bazel MODULE.bazel.lock WORKSPACE; do
-	[[ -f "${WORKSPACE_PATH}/${f}" ]] && cp "${WORKSPACE_PATH}/${f}" "${BAZEL_WORKSPACE_CONFIG_DIR}/"
-done
+# Save .bazelversion so we can restore it after git switch/clean (branches may not have it).
+# Only the version is pinned; each branch keeps its own MODULE.bazel / WORKSPACE.
+BAZEL_VERSION_FILE=$(mktemp)
+cleanup_bazel_version() { rm -f "${BAZEL_VERSION_FILE}"; }
+trap cleanup_bazel_version EXIT
+[[ -f "${WORKSPACE_PATH}/.bazelversion" ]] && cp "${WORKSPACE_PATH}/.bazelversion" "${BAZEL_VERSION_FILE}"
 restore_bazel_workspace_config() {
-	for f in .bazelversion MODULE.bazel MODULE.bazel.lock WORKSPACE; do
-		[[ -f "${BAZEL_WORKSPACE_CONFIG_DIR}/${f}" ]] && cp "${BAZEL_WORKSPACE_CONFIG_DIR}/${f}" "${WORKSPACE_PATH}/${f}"
-	done
+	[[ -f ${BAZEL_VERSION_FILE} ]] && cp "${BAZEL_VERSION_FILE}" "${WORKSPACE_PATH}/.bazelversion"
 }
 
 ifVerbose() {
@@ -97,7 +94,7 @@ if [[ -n ${VERBOSE} ]]; then
 	echo "Merge Instance Depth= ${merge_instance_depth}"
 
 	git checkout "${MERGE_INSTANCE_BRANCH}"
-	git clean -dfx -f --exclude=".trunk" --exclude="${WORKSPACE_REL}/.bazelversion" --exclude="${WORKSPACE_REL}/MODULE.bazel" --exclude="${WORKSPACE_REL}/MODULE.bazel.lock" --exclude="${WORKSPACE_REL}/WORKSPACE" .
+	git clean -dfx -f --exclude=".trunk" --exclude="${WORKSPACE_REL}/.bazelversion" .
 	restore_bazel_workspace_config
 	git submodule update --recursive
 	git log -n "${merge_instance_depth}" --oneline
@@ -107,7 +104,7 @@ if [[ -n ${VERBOSE} ]]; then
 	echo "PR Depth= ${pr_depth}"
 
 	git checkout "${PR_BRANCH_HEAD_SHA}"
-	git clean -dfx -f --exclude=".trunk" --exclude="${WORKSPACE_REL}/.bazelversion" --exclude="${WORKSPACE_REL}/MODULE.bazel" --exclude="${WORKSPACE_REL}/MODULE.bazel.lock" --exclude="${WORKSPACE_REL}/WORKSPACE" .
+	git clean -dfx -f --exclude=".trunk" --exclude="${WORKSPACE_REL}/.bazelversion" .
 	restore_bazel_workspace_config
 	git submodule update --recursive
 	git log -n "${pr_depth}" --oneline
@@ -125,14 +122,14 @@ impacted_targets_out=./impacted_targets_${PR_BRANCH_HEAD_SHA}
 
 # Generate Hashes for the Merge Instance Branch
 git switch "${MERGE_INSTANCE_BRANCH}"
-git clean -dfx -f --exclude=".trunk" --exclude="bazel-diff.jar" --exclude="${WORKSPACE_REL}/.bazelversion" --exclude="${WORKSPACE_REL}/MODULE.bazel" --exclude="${WORKSPACE_REL}/MODULE.bazel.lock" --exclude="${WORKSPACE_REL}/WORKSPACE" .
+git clean -dfx -f --exclude=".trunk" --exclude="bazel-diff.jar" --exclude="${WORKSPACE_REL}/.bazelversion" .
 restore_bazel_workspace_config
 git submodule update --recursive
 bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
 
 # Generate Hashes for the Merge Instance Branch + PR Branch
 git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH_HEAD_SHA}"
-git clean -dfx -f --exclude=".trunk" --exclude="${MERGE_INSTANCE_BRANCH_HEAD_SHA}" --exclude="bazel-diff.jar" --exclude="${WORKSPACE_REL}/.bazelversion" --exclude="${WORKSPACE_REL}/MODULE.bazel" --exclude="${WORKSPACE_REL}/MODULE.bazel.lock" --exclude="${WORKSPACE_REL}/WORKSPACE" .
+git clean -dfx -f --exclude=".trunk" --exclude="${MERGE_INSTANCE_BRANCH_HEAD_SHA}" --exclude="bazel-diff.jar" --exclude="${WORKSPACE_REL}/.bazelversion" .
 restore_bazel_workspace_config
 git submodule update --recursive
 bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
