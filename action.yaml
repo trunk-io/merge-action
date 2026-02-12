@@ -46,7 +46,7 @@ runs:
       id: detect-changed-paths
       if: ${{ inputs.impact-all-filters-path != '' }}
       # trunk-ignore(semgrep/yaml.github-actions.security.third-party-action-not-pinned-to-commit-sha.third-party-action-not-pinned-to-commit-sha)
-      uses: dorny/paths-filter@v2
+      uses: dorny/paths-filter@v3.0.2
       with:
         filters: ${{ inputs.impact-all-filters-path }}
 
@@ -68,8 +68,8 @@ runs:
 
     - name: Install Bazel in PATH
       if: ${{ steps.prerequisites.outputs.requires_default_bazel_installation == 'true' }}
-      # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
-      uses: bazelbuild/setup-bazelisk@v2
+      # trunk-ignore(semgrep): Trust third-party `bazel-contrib` GH Action
+      uses: bazel-contrib/setup-bazel@0.18.0
 
     - name: Compute Impacted Targets
       id: compute-impacted-targets

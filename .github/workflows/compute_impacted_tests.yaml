@@ -9,13 +9,13 @@ jobs:
     name: Compute Impacted Targets Tests
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Setup Bazel
-        # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
-        uses: bazelbuild/setup-bazelisk@v2
+        # trunk-ignore(semgrep): Trust third-party `bazel-contrib` GH Action
+        uses: bazel-contrib/setup-bazel@0.18.0
 
       - name: Compute Impacted Targets
         id: compute
