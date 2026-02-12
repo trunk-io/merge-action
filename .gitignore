@@ -1,2 +1,10 @@
 node_modules/**
 *_tmp
+
+# Bazel
+bazel-bin
+bazel-out
+bazel-testlogs
+bazel-genfiles
+bazel-*
+.bazelrc.user

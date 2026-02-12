@@ -19,6 +19,13 @@ lint:
     - linters: [ALL]
       paths:
         - node_modules/**
+        - "**/BUILD"
+        - "**/BUILD.bazel"
+        - "**/WORKSPACE"
+        - "**/WORKSPACE.bazel"
+        - "**/MODULE.bazel"
+        - "**/.bazelrc"
+        - "**/MODULE.bazel.lock"
 runtimes:
   enabled:
     - node@18.12.1
