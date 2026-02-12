@@ -27,7 +27,7 @@ jobs:
           PR_BRANCH: do_not_delete/test-branch-021226
           PR_BRANCH_HEAD_SHA: 097c8259c2e18da92f6189849ebc0f7f6dc624e5
           VERBOSE: 1
-          WORKSPACE_PATH: ./tests/simple_bazel_workspace
+          WORKSPACE_PATH: ./tests/bazel8
           BAZEL_STARTUP_OPTIONS: --host_jvm_args=-Xmx12G,--block_for_lock,--client_debug
           BAZEL_PATH: bazel
 
