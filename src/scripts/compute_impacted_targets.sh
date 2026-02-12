@@ -140,6 +140,9 @@ bazelDiff get-impacted-targets --startingHashes="${merge_instance_branch_out}" -
 
 num_impacted_targets=$(wc -l <"${impacted_targets_out}")
 echo "Computed ${num_impacted_targets} targets for sha ${PR_BRANCH_HEAD_SHA}"
+echo "=== Impacted targets (count=${num_impacted_targets}) ==="
+cat "${impacted_targets_out}"
+echo "=== End of impacted targets ==="
 
 # Outputs
 echo "impacted_targets_out=${impacted_targets_out}" >>"${GITHUB_OUTPUT}"
