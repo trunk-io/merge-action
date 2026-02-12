@@ -105,7 +105,7 @@ if [[ -n ${VERBOSE} ]]; then
 	pr_depth=$(git rev-list "${merge_base_sha}".."${PR_BRANCH_HEAD_SHA}" | wc -l)
 	echo "PR Depth= ${pr_depth}"
 
-	git checkout "${PR_BRANCH_HEAD_SHA}"
+	git checkout "${PR_BRANCH}"
 	git clean -dfx -f --exclude=".trunk"
 	git submodule update --recursive
 	git log -n "${pr_depth}" --oneline
@@ -121,8 +121,8 @@ merge_instance_branch_out=./${MERGE_INSTANCE_BRANCH_HEAD_SHA}
 merge_instance_with_pr_branch_out=./${PR_BRANCH_HEAD_SHA}_${MERGE_INSTANCE_BRANCH_HEAD_SHA}
 impacted_targets_out=./impacted_targets_${PR_BRANCH_HEAD_SHA}
 
-# Generate Hashes for the Merge Instance Branch
-git switch "${MERGE_INSTANCE_BRANCH}"
+# Generate Hashes for the Merge Instance Branch (merge branch at merge SHA)
+git checkout "${MERGE_INSTANCE_BRANCH_HEAD_SHA}"
 git clean -dfx -f --exclude=".trunk" --exclude="bazel-diff.jar" .
 restore_bazel_workspace_version
 git submodule update --recursive
