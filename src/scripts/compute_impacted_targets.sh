@@ -63,9 +63,13 @@ logIfVerbose() {
 }
 
 # If specified, parse the Bazel startup options when generating hashes.
+# When not VERBOSE, add flags to reduce Bazel output (progress, etc.).
 bazel_startup_options=""
 if [[ -n ${BAZEL_STARTUP_OPTIONS} ]]; then
 	bazel_startup_options=$(echo "${BAZEL_STARTUP_OPTIONS}" | tr ',' ' ')
+fi
+if [[ -z ${VERBOSE} ]]; then
+	bazel_startup_options="${bazel_startup_options:+${bazel_startup_options} }--noshow_progress"
 fi
 logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
@@ -113,8 +117,12 @@ fi
 
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/download/13.0.0/bazel-diff_deploy.jar
-_java -jar bazel-diff.jar -V
-_bazel version # Does not require running with startup options.
+ifVerbose _java -jar bazel-diff.jar -V
+if [[ -n ${VERBOSE} ]]; then
+	_bazel version
+else
+	_bazel version >/dev/null 2>&1
+fi
 
 # Output Files
 merge_instance_branch_out=./${MERGE_INSTANCE_BRANCH_HEAD_SHA}
