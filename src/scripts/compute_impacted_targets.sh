@@ -18,39 +18,6 @@ if [[ -z ${WORKSPACE_PATH} ]]; then
 	exit 2
 fi
 
-# Default BAZEL_PATH so it can be resolved.
-if [[ -z ${BAZEL_PATH-} ]]; then
-	BAZEL_PATH=bazel
-fi
-
-# Resolve WORKSPACE_PATH to absolute so Bazel and bazel-diff run from the workspace.
-WORKSPACE_PATH=$(cd "${WORKSPACE_PATH}" && pwd)
-REPO_ROOT=$(git rev-parse --show-toplevel)
-# Relative path from repo root for git clean --exclude (so we can preserve workspace version pin).
-WORKSPACE_REL=${WORKSPACE_PATH#"${REPO_ROOT}/"}
-
-# Resolve BAZEL_PATH to absolute only if it's outside the repo (so git clean can't remove it).
-# Otherwise keep "bazel" so the JAR looks it up via PATH.
-if [[ ${BAZEL_PATH} != /* ]]; then
-	resolved=$(command -v "${BAZEL_PATH}" || true)
-	if [[ -n ${resolved} && ${resolved} != "${REPO_ROOT}"/* ]]; then
-		BAZEL_PATH=${resolved}
-	fi
-fi
-
-# Save .bazelversion so we can restore it after git switch/clean (branches may not have it).
-# Only the version is pinned; each branch keeps its own MODULE.bazel / WORKSPACE.
-BAZEL_VERSION_FILE=$(mktemp)
-cleanup_bazel_version() { rm -f "${BAZEL_VERSION_FILE}"; }
-trap cleanup_bazel_version EXIT
-[[ -f "${WORKSPACE_PATH}/.bazelversion" ]] && cp "${WORKSPACE_PATH}/.bazelversion" "${BAZEL_VERSION_FILE}"
-restore_bazel_workspace_version() {
-	if [[ -f ${BAZEL_VERSION_FILE} ]]; then
-		mkdir -p "${WORKSPACE_PATH}"
-		cp "${BAZEL_VERSION_FILE}" "${WORKSPACE_PATH}/.bazelversion"
-	fi
-}
-
 ifVerbose() {
 	if [[ -n ${VERBOSE} ]]; then
 		"$@"
@@ -63,20 +30,15 @@ logIfVerbose() {
 }
 
 # If specified, parse the Bazel startup options when generating hashes.
-# When not VERBOSE, add flags to reduce Bazel output (progress, etc.).
 bazel_startup_options=""
 if [[ -n ${BAZEL_STARTUP_OPTIONS} ]]; then
 	bazel_startup_options=$(echo "${BAZEL_STARTUP_OPTIONS}" | tr ',' ' ')
 fi
-if [[ -z ${VERBOSE} ]]; then
-	bazel_startup_options="${bazel_startup_options:+${bazel_startup_options} }--noshow_progress"
-fi
 logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
 _bazel() {
-	# Run Bazel from the workspace so MODULE.bazel / .bazelversion are found.
 	# trunk-ignore(shellcheck)
-	(cd "${WORKSPACE_PATH}" && "${BAZEL_PATH}" ${bazel_startup_options} "$@")
+	${BAZEL_PATH} ${bazel_startup_options} "$@"
 }
 
 # trunk-ignore(shellcheck)
@@ -101,7 +63,7 @@ if [[ -n ${VERBOSE} ]]; then
 	echo "Merge Instance Depth= ${merge_instance_depth}"
 
 	git checkout "${MERGE_INSTANCE_BRANCH}"
-	git clean -dfx -f --exclude=".trunk"
+	git clean -dfx -f --exclude=".trunk" .
 	git submodule update --recursive
 	git log -n "${merge_instance_depth}" --oneline
 
@@ -110,36 +72,31 @@ if [[ -n ${VERBOSE} ]]; then
 	echo "PR Depth= ${pr_depth}"
 
 	git checkout "${PR_BRANCH}"
-	git clean -dfx -f --exclude=".trunk"
+	git clean -dfx -f --exclude=".trunk" .
 	git submodule update --recursive
 	git log -n "${pr_depth}" --oneline
 fi
 
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
-curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/download/13.0.0/bazel-diff_deploy.jar
-ifVerbose _java -jar bazel-diff.jar -V
-if [[ -n ${VERBOSE} ]]; then
-	_bazel version
-else
-	_bazel version >/dev/null 2>&1
-fi
+curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
+_java -jar bazel-diff.jar -V
+_bazel version # Does not require running with startup options.
 
 # Output Files
 merge_instance_branch_out=./${MERGE_INSTANCE_BRANCH_HEAD_SHA}
 merge_instance_with_pr_branch_out=./${PR_BRANCH_HEAD_SHA}_${MERGE_INSTANCE_BRANCH_HEAD_SHA}
 impacted_targets_out=./impacted_targets_${PR_BRANCH_HEAD_SHA}
 
-# Generate Hashes for the Merge Instance Branch (merge branch at merge SHA)
+# Generate Hashes for the Merge Instance Branch (merge branch at merge SHA).
+# Use the exact SHA so we compare the requested merge state, not the branch ref.
 git checkout "${MERGE_INSTANCE_BRANCH_HEAD_SHA}"
 git clean -dfx -f --exclude=".trunk" --exclude="bazel-diff.jar" .
-restore_bazel_workspace_version
 git submodule update --recursive
 bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
 
-# Generate Hashes for the Merge Instance Branch + PR Branch
+# Generate Hashes for the Merge Instance Branch + PR Branch (PR branch at PR SHA).
 git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH_HEAD_SHA}"
 git clean -dfx -f --exclude=".trunk" --exclude="${MERGE_INSTANCE_BRANCH_HEAD_SHA}" --exclude="bazel-diff.jar" .
-restore_bazel_workspace_version
 git submodule update --recursive
 bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
 
@@ -148,9 +105,6 @@ bazelDiff get-impacted-targets --startingHashes="${merge_instance_branch_out}" -
 
 num_impacted_targets=$(wc -l <"${impacted_targets_out}")
 echo "Computed ${num_impacted_targets} targets for sha ${PR_BRANCH_HEAD_SHA}"
-echo "=== Impacted targets (count=${num_impacted_targets}) ==="
-cat "${impacted_targets_out}"
-echo "=== End of impacted targets ==="
 
 # Outputs
 echo "impacted_targets_out=${impacted_targets_out}" >>"${GITHUB_OUTPUT}"
