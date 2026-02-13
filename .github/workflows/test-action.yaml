@@ -1,8 +1,7 @@
 # Runs this repo's action against the current PR so we validate the action works
 # with the commit we're directly using. Upload step requires TRUNK_TOKEN secret.
 name: Test Action (Self)
-on:
-  pull_request:
+on: pull_request
 
 permissions: read-all
 
