@@ -106,13 +106,30 @@ impacted_targets_out=./impacted_targets_${PR_BRANCH_HEAD_SHA}
 git checkout "${MERGE_INSTANCE_BRANCH_HEAD_SHA}"
 git clean -dfx -f --exclude=".trunk" --exclude="bazel-diff.jar" .
 git submodule update --recursive
-bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
+if [[ -d ${WORKSPACE_PATH} ]]; then
+	bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
+else
+	echo "Workspace ${WORKSPACE_PATH} does not exist at merge instance SHA (${MERGE_INSTANCE_BRANCH_HEAD_SHA}); using empty hashes."
+	touch "${merge_instance_branch_out}"
+fi
 
 # Generate Hashes for the Merge Instance Branch + PR Branch (PR branch at PR SHA).
 git -c "user.name=Trunk Actions" -c "user.email=actions@trunk.io" merge --squash "${PR_BRANCH_HEAD_SHA}"
 git clean -dfx -f --exclude=".trunk" --exclude="${MERGE_INSTANCE_BRANCH_HEAD_SHA}" --exclude="bazel-diff.jar" .
 git submodule update --recursive
-bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
+if [[ -d ${WORKSPACE_PATH} ]]; then
+	bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
+else
+	echo "Workspace ${WORKSPACE_PATH} does not exist at PR SHA (${PR_BRANCH_HEAD_SHA}); using empty hashes."
+	touch "${merge_instance_with_pr_branch_out}"
+fi
+
+# If workspace is missing on BOTH sides, there is nothing to diff.
+if [[ ! -s ${merge_instance_branch_out} && ! -s ${merge_instance_with_pr_branch_out} ]]; then
+	echo "ERROR: Bazel workspace '${WORKSPACE_PATH}' was not found at either the merge instance SHA (${MERGE_INSTANCE_BRANCH_HEAD_SHA}) or the PR SHA (${PR_BRANCH_HEAD_SHA})."
+	echo "Ensure the workspace path is correct and exists on both the target branch and the PR branch."
+	exit 2
+fi
 
 # Compute impacted targets
 bazelDiff get-impacted-targets --startingHashes="${merge_instance_branch_out}" --finalHashes="${merge_instance_with_pr_branch_out}" --output="${impacted_targets_out}"
