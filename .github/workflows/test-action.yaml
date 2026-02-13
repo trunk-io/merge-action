@@ -16,12 +16,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get checked-out ref
-        id: get-ref
-        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-
       - name: Run merge-action (this repo)
-        uses: trunk-io/merge-action@${{ steps.get-ref.outputs.sha }}
+        uses: trunk-io/merge-action@${{ inputs.ref }}
         with:
           trunk-token: NOT_NEEDED
           bazel-workspace-path: ./tests/bazel8
