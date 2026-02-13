@@ -26,11 +26,14 @@ WORKSPACE_PATH=$(cd "${WORKSPACE_PATH}" && pwd)
 if [[ -z ${BAZEL_PATH-} ]]; then
 	BAZEL_PATH=bazel
 fi
-# Ensure the directory containing the Bazel executable is on PATH so the bazel-diff JAR's
-# child process (and any script shebang like #!/usr/bin/env bazel) can find it.
+# Resolve directory containing Bazel so we can pass PATH explicitly to the JAR (its child process often doesn't inherit our PATH).
+bazel_dir=""
 if [[ ${BAZEL_PATH} != /* ]]; then
-	bazel_dir=$(command -v "${BAZEL_PATH}" 2>/dev/null) && bazel_dir=$(dirname "${bazel_dir}") || true
-	[[ -n ${bazel_dir} ]] && export PATH="${bazel_dir}:${PATH}"
+	_bazel_exe=$(command -v "${BAZEL_PATH}" 2>/dev/null) || true
+	if [[ -n ${_bazel_exe} ]]; then
+		bazel_dir=$(dirname "${_bazel_exe}")
+		export PATH="${bazel_dir}:${PATH}"
+	fi
 fi
 
 ifVerbose() {
@@ -61,10 +64,19 @@ _bazel() {
 alias _java=$(_bazel info java-home)/bin/java
 
 bazelDiff() {
-	if [[ -n ${VERBOSE} ]]; then
-		_java -jar bazel-diff.jar "$@" --verbose
+	# Pass PATH explicitly so the JAR's child process (Bazel) can find the "bazel" executable.
+	if [[ -n ${bazel_dir} ]]; then
+		if [[ -n ${VERBOSE} ]]; then
+			env PATH="${bazel_dir}:${PATH}" _java -jar bazel-diff.jar "$@" --verbose
+		else
+			env PATH="${bazel_dir}:${PATH}" _java -jar bazel-diff.jar "$@"
+		fi
 	else
-		_java -jar bazel-diff.jar "$@"
+		if [[ -n ${VERBOSE} ]]; then
+			_java -jar bazel-diff.jar "$@" --verbose
+		else
+			_java -jar bazel-diff.jar "$@"
+		fi
 	fi
 }
 
