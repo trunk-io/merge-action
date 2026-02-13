@@ -67,7 +67,7 @@ runs:
       uses: dcarbone/install-jq-action@v1.0.1
 
     - name: Install Bazel in PATH
-      if: ${{ steps.prerequisites.outputs.requires_default_bazel_installation == 'true' }}
+      # Always run so the compute script and bazel-diff JAR's child process can find bazel on PATH.
       # trunk-ignore(semgrep): Trust third-party `bazel-contrib` GH Action
       uses: bazel-contrib/setup-bazel@0.18.0
 

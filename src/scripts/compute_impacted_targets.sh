@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-shopt -s expand_aliases
 
 if [[ -z ${MERGE_INSTANCE_BRANCH} ]]; then
 	echo "Missing branch"
@@ -26,15 +25,6 @@ WORKSPACE_PATH=$(cd "${WORKSPACE_PATH}" && pwd)
 if [[ -z ${BAZEL_PATH-} ]]; then
 	BAZEL_PATH=bazel
 fi
-# Resolve directory containing Bazel so we can pass PATH explicitly to the JAR (its child process often doesn't inherit our PATH).
-bazel_dir=""
-if [[ ${BAZEL_PATH} != /* ]]; then
-	_bazel_exe=$(command -v "${BAZEL_PATH}" 2>/dev/null) || true
-	if [[ -n ${_bazel_exe} ]]; then
-		bazel_dir=$(dirname "${_bazel_exe}")
-		export PATH="${bazel_dir}:${PATH}"
-	fi
-fi
 
 ifVerbose() {
 	if [[ -n ${VERBOSE} ]]; then
@@ -55,28 +45,24 @@ fi
 logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
 _bazel() {
-	# Run from workspace so Bazel finds MODULE.bazel / .bazelversion (avoids batch-mode and "info" error).
+	# Run from workspace so Bazel finds MODULE.bazel / .bazelversion.
 	# trunk-ignore(shellcheck)
-	(cd "${WORKSPACE_PATH}" && "${BAZEL_PATH}" ${bazel_startup_options} "$@")
+	(cd "${WORKSPACE_PATH}" && ${BAZEL_PATH} ${bazel_startup_options} "$@")
 }
 
-# trunk-ignore(shellcheck)
-alias _java=$(_bazel info java-home)/bin/java
+# Use Bazel's JDK for the JAR when available; otherwise assume java is on PATH.
+_java_home=$(_bazel info java-home 2>/dev/null) || true
+if [[ -n ${_java_home} && -x "${_java_home}/bin/java" ]]; then
+	_java="${_java_home}/bin/java"
+else
+	_java=java
+fi
 
 bazelDiff() {
-	# Pass PATH explicitly so the JAR's child process (Bazel) can find the "bazel" executable.
-	if [[ -n ${bazel_dir} ]]; then
-		if [[ -n ${VERBOSE} ]]; then
-			env PATH="${bazel_dir}:${PATH}" _java -jar bazel-diff.jar "$@" --verbose
-		else
-			env PATH="${bazel_dir}:${PATH}" _java -jar bazel-diff.jar "$@"
-		fi
+	if [[ -n ${VERBOSE} ]]; then
+		"${_java}" -jar bazel-diff.jar "$@" --verbose
 	else
-		if [[ -n ${VERBOSE} ]]; then
-			_java -jar bazel-diff.jar "$@" --verbose
-		else
-			_java -jar bazel-diff.jar "$@"
-		fi
+		"${_java}" -jar bazel-diff.jar "$@"
 	fi
 }
 
@@ -107,7 +93,7 @@ fi
 
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
-_java -jar bazel-diff.jar -V
+"${_java}" -jar bazel-diff.jar -V
 _bazel version # Does not require running with startup options.
 
 # Output Files
