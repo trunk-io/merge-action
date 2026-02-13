@@ -26,7 +26,6 @@ jobs:
           MERGE_INSTANCE_BRANCH_HEAD_SHA: 50c0d2d529308aa7784bec0c666208ed437da93c
           PR_BRANCH: do_not_delete/test-branch-021226
           PR_BRANCH_HEAD_SHA: d9f5f82b2e41c3fc372ef0331a91b5738fa1150a
-          VERBOSE: 1
           WORKSPACE_PATH: ./tests/bazel8
           BAZEL_STARTUP_OPTIONS: --host_jvm_args=-Xmx12G,--block_for_lock
           BAZEL_PATH: bazel
