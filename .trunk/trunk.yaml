@@ -1,24 +1,24 @@
 version: 0.1
 cli:
-  version: 1.19.0
+  version: 1.25.0
 plugins:
   sources:
     - id: trunk
-      ref: v1.4.2
+      ref: v1.7.4
       uri: https://github.com/trunk-io/plugins
     - id: configs
       uri: https://github.com/trunk-io/configs
-      ref: v1.0.2
+      ref: v1.1.2
 lint:
   disabled:
     - eslint
   enabled:
-    - prettier@3.2.5
-    - trufflehog@3.67.5
+    - prettier@3.8.1
+    - trufflehog@3.93.3
   ignore:
     - linters: [ALL]
       paths:
         - node_modules/**
 runtimes:
   enabled:
-    - node@18.12.1
+    - node@24.11.0

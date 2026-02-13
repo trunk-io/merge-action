@@ -45,8 +45,7 @@ runs:
     - name: Detect changed paths
       id: detect-changed-paths
       if: ${{ inputs.impact-all-filters-path != '' }}
-      # trunk-ignore(semgrep/yaml.github-actions.security.third-party-action-not-pinned-to-commit-sha.third-party-action-not-pinned-to-commit-sha)
-      uses: dorny/paths-filter@v2
+      uses: dorny/paths-filter@v3.0.2
       with:
         filters: ${{ inputs.impact-all-filters-path }}
 
@@ -66,10 +65,18 @@ runs:
       # trunk-ignore(semgrep): Trust third-party action to install JQ. Source code: https://github.com/dcarbone/install-jq-action/
       uses: dcarbone/install-jq-action@v1.0.1
 
+    - name: Set up Java
+      if: ${{ steps.prerequisites.outputs.requires_java_installation == 'true' }}
+      # Needed for the bazel-diff JAR. Minimal runner images (Hosted Compute) may lack Java.
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: "17"
+
     - name: Install Bazel in PATH
-      if: ${{ steps.prerequisites.outputs.requires_default_bazel_installation == 'true' }}
-      # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
-      uses: bazelbuild/setup-bazelisk@v2
+      if: ${{ steps.prerequisites.outputs.requires_bazel_installation == 'true' }}
+      # Minimal runner images (Hosted Compute) may lack Bazel/Bazelisk.
+      uses: bazel-contrib/setup-bazel@0.18.0
 
     - name: Compute Impacted Targets
       id: compute-impacted-targets

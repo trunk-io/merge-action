@@ -1,0 +1,41 @@
+name: Pull Request
+on: pull_request
+
+permissions: read-all
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    name: Compute Impacted Targets Tests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute Impacted Targets
+        id: compute
+        run: ./src/scripts/compute_impacted_targets.sh
+        shell: bash
+        env:
+          MERGE_INSTANCE_BRANCH: do_not_delete/test-branch-021226
+          MERGE_INSTANCE_BRANCH_HEAD_SHA: 50c0d2d529308aa7784bec0c666208ed437da93c
+          PR_BRANCH_HEAD_SHA: d9f5f82b2e41c3fc372ef0331a91b5738fa1150a
+          VERBOSE: 0
+          WORKSPACE_PATH: ./tests/bazel8
+          BAZEL_STARTUP_OPTIONS: --host_jvm_args=-Xmx12G,--block_for_lock
+          BAZEL_PATH: bazel
+
+      - name: Validate Impacted Targets Computation
+        shell: bash
+        run: |
+          impacted_targets_file="${{ steps.compute.outputs.impacted_targets_out }}"
+          target_count=$(wc -l < "$impacted_targets_file")
+          echo "=== Impacted targets (count=$target_count) ==="
+          cat "$impacted_targets_file"
+          echo "=== End of impacted targets ==="
+
+          if [[ $target_count -eq 0 ]]; then
+            echo "Expected at least one impacted target but got 0"
+            exit 1
+          fi
