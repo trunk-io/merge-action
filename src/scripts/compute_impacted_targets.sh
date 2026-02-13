@@ -8,6 +8,10 @@ if [[ -z ${MERGE_INSTANCE_BRANCH} ]]; then
 	exit 2
 fi
 
+if [[ -n ${PR_BRANCH-} ]]; then
+	echo "PR_BRANCH is deprecated and ignored; only PR_BRANCH_HEAD_SHA is used." >&2
+fi
+
 if [[ (-z ${MERGE_INSTANCE_BRANCH_HEAD_SHA}) || (-z ${PR_BRANCH_HEAD_SHA}) ]]; then
 	echo "Missing sha"
 	exit 2
@@ -71,7 +75,7 @@ if [[ -n ${VERBOSE} ]]; then
 	pr_depth=$(git rev-list "${merge_base_sha}".."${PR_BRANCH_HEAD_SHA}" | wc -l)
 	echo "PR Depth= ${pr_depth}"
 
-	git checkout "${PR_BRANCH}"
+	git checkout "${PR_BRANCH_HEAD_SHA}"
 	git clean -dfx -f --exclude=".trunk" .
 	git submodule update --recursive
 	git log -n "${pr_depth}" --oneline
