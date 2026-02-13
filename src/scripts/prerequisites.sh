@@ -26,11 +26,16 @@ if [[ -z ${workspace_path} ]]; then
 	workspace_path=$(pwd)
 fi
 
-requires_default_bazel_installation="false"
+requires_bazel_installation="false"
 if [[ ${BAZEL_PATH} == "bazel" ]]; then
-	if ! command -v bazel; then
-		requires_default_bazel_installation="true"
+	if ! command -v bazel >/dev/null 2>&1; then
+		requires_bazel_installation="true"
 	fi
+fi
+
+requires_java_installation="false"
+if ! command -v java >/dev/null 2>&1; then
+	requires_java_installation="true"
 fi
 
 changes_count=0
@@ -39,7 +44,7 @@ if [[ -n ${IMPACTS_FILTERS_CHANGES+x} ]]; then
 	changes_count=$(echo "${IMPACTS_FILTERS_CHANGES}" | jq length)
 	if [[ ${changes_count} -gt 0 ]]; then
 		impacts_all_detected="true"
-		requires_default_bazel_installation="false"
+		requires_bazel_installation="false"
 	fi
 fi
 
@@ -60,4 +65,5 @@ echo "merge_instance_branch=${merge_instance_branch}" >>"${GITHUB_OUTPUT}"
 echo "merge_instance_branch_head_sha=${merge_instance_branch_head_sha}" >>"${GITHUB_OUTPUT}"
 echo "impacts_all_detected=${impacts_all_detected}" >>"${GITHUB_OUTPUT}"
 echo "workspace_path=${workspace_path}" >>"${GITHUB_OUTPUT}"
-echo "requires_default_bazel_installation=${requires_default_bazel_installation}" >>"${GITHUB_OUTPUT}"
+echo "requires_bazel_installation=${requires_bazel_installation}" >>"${GITHUB_OUTPUT}"
+echo "requires_java_installation=${requires_java_installation}" >>"${GITHUB_OUTPUT}"

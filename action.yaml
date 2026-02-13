@@ -66,6 +66,21 @@ runs:
       # trunk-ignore(semgrep): Trust third-party action to install JQ. Source code: https://github.com/dcarbone/install-jq-action/
       uses: dcarbone/install-jq-action@v1.0.1
 
+    - name: Set up Java
+      if: ${{ steps.prerequisites.outputs.requires_java_installation == 'true' }}
+      # Needed for the bazel-diff JAR. Minimal runner images (Hosted Compute) may lack Java.
+      # trunk-ignore(semgrep): Trust first-party `actions/setup-java` GH Action
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: "17"
+
+    - name: Install Bazel in PATH
+      if: ${{ steps.prerequisites.outputs.requires_bazel_installation == 'true' }}
+      # Minimal runner images (Hosted Compute) may lack Bazel/Bazelisk.
+      # trunk-ignore(semgrep): Trust third-party `bazel-contrib` GH Action
+      uses: bazel-contrib/setup-bazel@0.18.0
+
     - name: Compute Impacted Targets
       id: compute-impacted-targets
       run: ${GITHUB_ACTION_PATH}/src/scripts/compute_impacted_targets.sh
