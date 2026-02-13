@@ -66,6 +66,18 @@ runs:
       # trunk-ignore(semgrep): Trust third-party action to install JQ. Source code: https://github.com/dcarbone/install-jq-action/
       uses: dcarbone/install-jq-action@v1.0.1
 
+    - name: "DEBUG: Check runner baseline (java & bazel)"
+      shell: bash
+      run: |
+        echo "=== BEFORE setup-bazel ==="
+        echo "JAVA_HOME=${JAVA_HOME-<unset>}"
+        echo "JAVA_HOME_17_X64=${JAVA_HOME_17_X64-<unset>}"
+        echo "which java=$(command -v java 2>/dev/null || echo '<not found>')"
+        java -version 2>&1 | head -1 || true
+        echo "which bazel=$(command -v bazel 2>/dev/null || echo '<not found>')"
+        echo "which bazelisk=$(command -v bazelisk 2>/dev/null || echo '<not found>')"
+        bazelisk version 2>&1 | head -3 || true
+
     - name: Install Bazel in PATH
       # Always run so the compute script and bazel-diff JAR's child process can find bazel on PATH.
       # trunk-ignore(semgrep): Trust third-party `bazel-contrib` GH Action
