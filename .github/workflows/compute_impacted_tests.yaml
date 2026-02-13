@@ -33,19 +33,14 @@ jobs:
 
       - name: Validate Impacted Targets Computation
         shell: bash
-        env:
-          MERGE_INSTANCE_BRANCH_HEAD_SHA: 6f91712082f791d025fda81b67a8b0569fd01025
-          PR_BRANCH_HEAD_SHA: bce634a9385344a379c0871c3c92f116f3f284b2
         run: |
           impacted_targets_file="${{ steps.compute.outputs.impacted_targets_out }}"
           target_count=$(wc -l < "$impacted_targets_file")
           echo "=== Impacted targets (count=$target_count) ==="
           cat "$impacted_targets_file"
           echo "=== End of impacted targets ==="
-          # When base and PR are the same SHA, expect 0 targets. When different, we expect some.
-          if [[ "$MERGE_INSTANCE_BRANCH_HEAD_SHA" == "$PR_BRANCH_HEAD_SHA" ]]; then
-            if [[ $target_count -ne 0 ]]; then
-              echo "Expected 0 impacted targets (same SHA) but got $target_count"
-              exit 1
-            fi
+
+          if [[ $target_count -eq 0 ]]; then
+            echo "Expected at least one impacted target but got 0"
+            exit 1
           fi
