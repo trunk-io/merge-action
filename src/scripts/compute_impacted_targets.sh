@@ -110,7 +110,7 @@ if [[ -d ${WORKSPACE_PATH} ]]; then
 	bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_branch_out}"
 else
 	echo "Workspace ${WORKSPACE_PATH} does not exist at merge instance SHA (${MERGE_INSTANCE_BRANCH_HEAD_SHA}); using empty hashes."
-	touch "${merge_instance_branch_out}"
+	echo '{}' >"${merge_instance_branch_out}"
 fi
 
 # Generate Hashes for the Merge Instance Branch + PR Branch (PR branch at PR SHA).
@@ -121,11 +121,14 @@ if [[ -d ${WORKSPACE_PATH} ]]; then
 	bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
 else
 	echo "Workspace ${WORKSPACE_PATH} does not exist at PR SHA (${PR_BRANCH_HEAD_SHA}); using empty hashes."
-	touch "${merge_instance_with_pr_branch_out}"
+	echo '{}' >"${merge_instance_with_pr_branch_out}"
 fi
 
 # If workspace is missing on BOTH sides, there is nothing to diff.
-if [[ ! -s ${merge_instance_branch_out} && ! -s ${merge_instance_with_pr_branch_out} ]]; then
+# Hash files containing only "{}" mean the workspace was missing at that commit.
+merge_empty=$(cat "${merge_instance_branch_out}")
+pr_empty=$(cat "${merge_instance_with_pr_branch_out}")
+if [[ ${merge_empty} == "{}" && ${pr_empty} == "{}" ]]; then
 	echo "ERROR: Bazel workspace '${WORKSPACE_PATH}' was not found at either the merge instance SHA (${MERGE_INSTANCE_BRANCH_HEAD_SHA}) or the PR SHA (${PR_BRANCH_HEAD_SHA})."
 	echo "Ensure the workspace path is correct and exists on both the target branch and the PR branch."
 	exit 2
