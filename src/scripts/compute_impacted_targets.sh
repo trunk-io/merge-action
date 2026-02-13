@@ -90,10 +90,17 @@ if [[ -n ${VERBOSE} ]]; then
 fi
 
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
-curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
-"${_java}" -jar bazel-diff.jar -V
-# trunk-ignore(shellcheck)
-(cd "${WORKSPACE_PATH}" && ${BAZEL_PATH} version)
+curl --retry 5 --silent --show-error -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
+
+if [[ -n ${VERBOSE} ]]; then
+	"${_java}" -jar bazel-diff.jar -V
+	# trunk-ignore(shellcheck)
+	(cd "${WORKSPACE_PATH}" && ${BAZEL_PATH} version)
+else
+	"${_java}" -jar bazel-diff.jar -V >/dev/null 2>&1
+	# trunk-ignore(shellcheck)
+	(cd "${WORKSPACE_PATH}" && ${BAZEL_PATH} version) >/dev/null 2>&1
+fi
 
 # Output Files
 merge_instance_branch_out=./${MERGE_INSTANCE_BRANCH_HEAD_SHA}
