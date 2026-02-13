@@ -28,7 +28,7 @@ jobs:
           PR_BRANCH_HEAD_SHA: d9f5f82b2e41c3fc372ef0331a91b5738fa1150a
           VERBOSE: 1
           WORKSPACE_PATH: ./tests/bazel8
-          BAZEL_STARTUP_OPTIONS: --host_jvm_args=-Xmx12G,--block_for_lock,--client_debug
+          BAZEL_STARTUP_OPTIONS: --host_jvm_args=-Xmx12G,--block_for_lock
           BAZEL_PATH: bazel
 
       - name: Validate Impacted Targets Computation
