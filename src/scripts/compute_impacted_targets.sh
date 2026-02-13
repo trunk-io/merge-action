@@ -21,6 +21,16 @@ if [[ -z ${WORKSPACE_PATH} ]]; then
 	echo "Missing workspace path"
 	exit 2
 fi
+WORKSPACE_PATH=$(cd "${WORKSPACE_PATH}" && pwd)
+
+if [[ -z ${BAZEL_PATH-} ]]; then
+	BAZEL_PATH=bazel
+fi
+# Resolve to absolute path so the bazel-diff JAR can run Bazel without relying on PATH.
+if [[ ${BAZEL_PATH} != /* ]]; then
+	resolved=$(command -v "${BAZEL_PATH}" 2>/dev/null) || true
+	[[ -n ${resolved} ]] && BAZEL_PATH=${resolved}
+fi
 
 ifVerbose() {
 	if [[ -n ${VERBOSE} ]]; then
@@ -41,8 +51,9 @@ fi
 logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
 _bazel() {
+	# Run from workspace so Bazel finds MODULE.bazel / .bazelversion (avoids batch-mode and "info" error).
 	# trunk-ignore(shellcheck)
-	${BAZEL_PATH} ${bazel_startup_options} "$@"
+	(cd "${WORKSPACE_PATH}" && "${BAZEL_PATH}" ${bazel_startup_options} "$@")
 }
 
 # trunk-ignore(shellcheck)
