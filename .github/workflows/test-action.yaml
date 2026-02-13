@@ -19,6 +19,6 @@ jobs:
       - name: Run merge-action (this repo)
         uses: ./
         with:
-          trunk-token: NOT_NEEDED
+          trunk-token: ${{ secrets.TRUNK_TOKEN }}
           bazel-workspace-path: ./tests/bazel8
           verbose: "false"
