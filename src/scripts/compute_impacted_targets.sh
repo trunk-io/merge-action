@@ -26,10 +26,11 @@ WORKSPACE_PATH=$(cd "${WORKSPACE_PATH}" && pwd)
 if [[ -z ${BAZEL_PATH-} ]]; then
 	BAZEL_PATH=bazel
 fi
-# Resolve to absolute path so the bazel-diff JAR can run Bazel without relying on PATH.
+# Ensure the directory containing the Bazel executable is on PATH so the bazel-diff JAR's
+# child process (and any script shebang like #!/usr/bin/env bazel) can find it.
 if [[ ${BAZEL_PATH} != /* ]]; then
-	resolved=$(command -v "${BAZEL_PATH}" 2>/dev/null) || true
-	[[ -n ${resolved} ]] && BAZEL_PATH=${resolved}
+	bazel_dir=$(command -v "${BAZEL_PATH}" 2>/dev/null) && bazel_dir=$(dirname "${bazel_dir}") || true
+	[[ -n ${bazel_dir} ]] && export PATH="${bazel_dir}:${PATH}"
 fi
 
 ifVerbose() {
