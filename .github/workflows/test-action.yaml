@@ -17,7 +17,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run merge-action (this repo)
-        uses: trunk-io/merge-action@${{ inputs.ref }}
+        uses: ./
         with:
           trunk-token: NOT_NEEDED
           bazel-workspace-path: ./tests/bazel8
