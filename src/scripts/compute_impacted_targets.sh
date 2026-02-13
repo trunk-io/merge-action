@@ -51,6 +51,7 @@ _bazel() {
 }
 
 # Use Bazel's JDK for the JAR when available; otherwise assume java is on PATH.
+# trunk-ignore(shellcheck/SC2310): Intentional — we want _bazel failure to be non-fatal here.
 _java_home=$(_bazel info java-home 2>/dev/null) || true
 if [[ -n ${_java_home} && -x "${_java_home}/bin/java" ]]; then
 	_java="${_java_home}/bin/java"
