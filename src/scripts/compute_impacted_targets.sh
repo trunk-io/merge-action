@@ -44,28 +44,8 @@ if [[ -n ${BAZEL_STARTUP_OPTIONS} ]]; then
 fi
 logIfVerbose "Bazel startup options" "${bazel_startup_options}"
 
-_bazel() {
-	# Run from workspace so Bazel finds MODULE.bazel / .bazelversion.
-	# trunk-ignore(shellcheck)
-	(cd "${WORKSPACE_PATH}" && ${BAZEL_PATH} ${bazel_startup_options} "$@")
-}
-
-# Debug: log Java and Bazel availability before resolution.
-echo "DEBUG: JAVA_HOME=${JAVA_HOME-<unset>}"
-echo "DEBUG: JAVA_HOME_17_X64=${JAVA_HOME_17_X64-<unset>}"
-echo "DEBUG: which java=$(command -v java 2>/dev/null || echo '<not found>')"
-echo "DEBUG: java -version=$( (java -version 2>&1 || true) | head -1)"
-echo "DEBUG: which bazel=$(command -v bazel 2>/dev/null || echo '<not found>')"
-echo "DEBUG: which bazelisk=$(command -v bazelisk 2>/dev/null || echo '<not found>')"
-echo "DEBUG: bazelisk --version=$(bazelisk --version 2>/dev/null || echo '<not found>')"
-echo "DEBUG: PATH=${PATH}"
-
-# Use Bazel's JDK for the JAR when available; otherwise assume java is on PATH.
-# trunk-ignore(shellcheck/SC2310): Intentional — we want _bazel failure to be non-fatal here.
-_java_home=$(_bazel info java-home 2>/dev/null) || true
-if [[ -n ${_java_home} && -x "${_java_home}/bin/java" ]]; then
-	_java="${_java_home}/bin/java"
-elif [[ -n ${JAVA_HOME-} && -x "${JAVA_HOME}/bin/java" ]]; then
+# Resolve java: prefer JAVA_HOME, fall back to PATH.
+if [[ -n ${JAVA_HOME-} && -x "${JAVA_HOME}/bin/java" ]]; then
 	_java="${JAVA_HOME}/bin/java"
 else
 	_java=$(command -v java 2>/dev/null || true)
@@ -112,7 +92,8 @@ fi
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar
 "${_java}" -jar bazel-diff.jar -V
-_bazel version # Does not require running with startup options.
+# trunk-ignore(shellcheck)
+(cd "${WORKSPACE_PATH}" && ${BAZEL_PATH} version)
 
 # Output Files
 merge_instance_branch_out=./${MERGE_INSTANCE_BRANCH_HEAD_SHA}

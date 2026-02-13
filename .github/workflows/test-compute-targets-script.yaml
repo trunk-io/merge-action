@@ -13,10 +13,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Bazel
-        # trunk-ignore(semgrep): Trust third-party `bazel-contrib` GH Action
-        uses: bazel-contrib/setup-bazel@0.18.0
-
       - name: Compute Impacted Targets
         id: compute
         run: ./src/scripts/compute_impacted_targets.sh
