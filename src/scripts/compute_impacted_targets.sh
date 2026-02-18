@@ -78,8 +78,14 @@ if [[ -n ${VERBOSE} ]]; then
 fi
 
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
-curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar --fail || \
-	curl --retry 5 -Lo bazel-diff.jar https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy-7.jar
+try_bazel_diff() {
+  curl --retry 5 -Lo bazel-diff.jar $1 --fail && _java -jar bazel-diff.jar -V
+}
+
+try_bazel_diff https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar ||
+    try_bazel_diff https://github.com/Tinder/bazel-diff/releases/download/14.0.1/bazel-diff_deploy.jar
+
+
 _java -jar bazel-diff.jar -V
 _bazel version # Does not require running with startup options.
 
