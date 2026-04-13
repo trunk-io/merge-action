@@ -79,12 +79,11 @@ fi
 
 # Install the bazel-diff JAR. Avoid cloning the repo, as there will be conflicting WORKSPACES.
 try_bazel_diff() {
-  curl --retry 5 -Lo bazel-diff.jar $1 --fail && _java -jar bazel-diff.jar -V
+	curl --retry 5 -Lo bazel-diff.jar $1 --fail && _java -jar bazel-diff.jar -V
 }
 
 try_bazel_diff https://github.com/Tinder/bazel-diff/releases/latest/download/bazel-diff_deploy.jar ||
-    try_bazel_diff https://github.com/Tinder/bazel-diff/releases/download/14.0.1/bazel-diff_deploy.jar
-
+	try_bazel_diff https://github.com/Tinder/bazel-diff/releases/download/14.0.1/bazel-diff_deploy.jar
 
 _java -jar bazel-diff.jar -V
 _bazel version # Does not require running with startup options.
@@ -107,7 +106,11 @@ git submodule update --recursive
 bazelDiff generate-hashes --bazelPath="${BAZEL_PATH}" --workspacePath="${WORKSPACE_PATH}" "-so=${bazel_startup_options}" "${merge_instance_with_pr_branch_out}"
 
 # Compute impacted targets
-bazelDiff get-impacted-targets --startingHashes="${merge_instance_branch_out}" --finalHashes="${merge_instance_with_pr_branch_out}" --output="${impacted_targets_out}"
+bazelDiff get-impacted-targets \
+	--startingHashes="${merge_instance_branch_out}" \
+	--finalHashes="${merge_instance_with_pr_branch_out}" \
+	--workspacePath="${WORKSPACE_PATH}" \
+	--output="${impacted_targets_out}"
 
 num_impacted_targets=$(wc -l <"${impacted_targets_out}")
 echo "Computed ${num_impacted_targets} targets for sha ${PR_BRANCH_HEAD_SHA}"
