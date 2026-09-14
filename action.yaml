@@ -68,8 +68,11 @@ runs:
 
     - name: Install Bazel in PATH
       if: ${{ steps.prerequisites.outputs.requires_default_bazel_installation == 'true' }}
-      # trunk-ignore(semgrep): Trust third-party `bazelbuild` GH Action
-      uses: bazelbuild/setup-bazelisk@v2
+      # trunk-ignore(semgrep): Trust third-party `bazel-contrib` GH Action
+      uses: bazel-contrib/setup-bazel@0.19.0
+      with:
+        # Matches the default of the `bazelbuild/setup-bazelisk` action this replaces.
+        bazelisk-version: 1.x
 
     - name: Compute Impacted Targets
       id: compute-impacted-targets
