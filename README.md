@@ -82,6 +82,11 @@ jobs:
 
 <!-- end usage -->
 
+Run this action on `pull_request`, never `pull_request_target`. It runs the pull request's code
+(Bazel evaluates its BUILD files and repository rules), and under `pull_request_target` a fork's
+code would run with this repository's secrets, its OIDC identity and, unless `permissions` narrows
+it, a write-scoped `GITHUB_TOKEN`.
+
 For more information on each possible argument you can provide, see
 [action.yaml](https://github.com/trunk-io/merge-action/blob/main/action.yaml).
 
@@ -116,9 +121,6 @@ jobs:
   commit. An organization admin must turn on **Fork PR CI access** for the repository in Trunk
   (Settings → Repositories). GitHub may hold a first-time contributor's run until a maintainer
   approves it.
-- Run it on `pull_request`, never `pull_request_target`: the action builds the pull request's code,
-  and under `pull_request_target` a fork's code would run with this repository's secrets and a
-  write-scoped token.
 - The login can only upload impacted targets for this repository. Every other Trunk API refuses it.
 
 `auth` defaults to `trunk-token`, so existing workflows are unchanged until they opt in. The login
