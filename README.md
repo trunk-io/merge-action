@@ -82,8 +82,49 @@ jobs:
 
 <!-- end usage -->
 
+Run this action on `pull_request`, never `pull_request_target`. It runs the pull request's code
+(Bazel evaluates its BUILD files and repository rules), and under `pull_request_target` a fork's
+code would run with this repository's secrets, its OIDC identity and, unless `permissions` narrows
+it, a write-scoped `GITHUB_TOKEN`.
+
 For more information on each possible argument you can provide, see
 [action.yaml](https://github.com/trunk-io/merge-action/blob/main/action.yaml).
+
+### Without a Trunk secret: `auth: github-actions`
+
+Instead of an API token, the action can log in with the run's own GitHub credential through
+[trunk-io/login](https://github.com/trunk-io/login). There is no Trunk secret to store or rotate,
+and it works on pull requests from forks, where repository secrets are not available.
+
+To switch, change three things in the workflow:
+
+```yaml
+jobs:
+  compute_impacted_targets:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read # only needed with impact-all-filters-path on a private repository
+      id-token: write # 1. the run's OIDC token
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: trunk-io/merge-action@v1
+        with:
+          auth: github-actions # 2. log in with GitHub instead of a token
+          # 3. remove `trunk-token`, then delete the secret once nothing else uses it
+```
+
+- **Pull requests from this repository** use the run's OIDC token, which is why the job needs
+  `id-token: write`.
+- **Pull requests from forks** use the job's `GITHUB_TOKEN`, bound to that pull request and its head
+  commit. An organization admin must turn on **Fork PR CI access** for the repository in Trunk
+  (Settings → Repositories). GitHub may hold a first-time contributor's run until a maintainer
+  approves it.
+- The login can only upload impacted targets for this repository. Every other Trunk API refuses it.
+
+`auth` defaults to `trunk-token`, so existing workflows are unchanged until they opt in. The login
+runs on Linux (x64, arm64) and Apple silicon macOS runners.
 
 ### Tests
 
